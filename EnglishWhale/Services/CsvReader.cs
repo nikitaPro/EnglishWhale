@@ -9,12 +9,13 @@ using EnglishWhale.Models;
 
 namespace EnglishWhale.Services
 {
-    class CsvReader
+    public class CsvReader
     {
-        private List<LanguageDictionary> translates;
+        public List<LanguageDictionary> Vocabularies { get; }
         private string path;
         public CsvReader(string path)
         {
+            Vocabularies = new List<LanguageDictionary>();
             this.path = path;
             readCsv();
         }
@@ -76,6 +77,8 @@ namespace EnglishWhale.Services
                     }
                    
                 }
+                Vocabularies.Add(directTranslation);
+                Vocabularies.Add(reversTranslation);
                 // TODO: Delete below
                 Console.WriteLine($"{directTranslation.From} -> {directTranslation.To} {directTranslation.Dict.Count}");
                 foreach (KeyValuePair<string, string> pair in directTranslation.Dict) 

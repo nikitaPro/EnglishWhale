@@ -32,7 +32,7 @@ namespace EnglishWhale
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.selectButton = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.filePathTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.startButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -49,10 +49,10 @@ namespace EnglishWhale
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(83, 12);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(447, 20);
-            this.textBox1.TabIndex = 1;
+            this.filePathTextBox.Location = new System.Drawing.Point(83, 12);
+            this.filePathTextBox.Name = "textBox1";
+            this.filePathTextBox.Size = new System.Drawing.Size(447, 20);
+            this.filePathTextBox.TabIndex = 1;
             // 
             // label1
             // 
@@ -82,7 +82,7 @@ namespace EnglishWhale
             this.ClientSize = new System.Drawing.Size(635, 139);
             this.Controls.Add(this.startButton);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.filePathTextBox);
             this.Controls.Add(this.selectButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -96,7 +96,7 @@ namespace EnglishWhale
         #endregion
 
         private System.Windows.Forms.Button selectButton;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox filePathTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button startButton;
     }

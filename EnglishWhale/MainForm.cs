@@ -25,18 +25,23 @@ namespace EnglishWhale
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                textBox1.Text = openFileDialog.FileName;
+                filePathTextBox.Text = openFileDialog.FileName;
                 startButton.Enabled = true;
             }
         }
 
         private void startButton_Click(object sender, EventArgs e)
         {
-            string path = textBox1.Text;
+            string path = filePathTextBox.Text;
             CsvReader csvReader;
             if (File.Exists(path))
             {
                 csvReader = new CsvReader(path);
+                QuizzesChooserForm qcForm = new QuizzesChooserForm();
+                qcForm.Add(csvReader.Vocabularies);
+                qcForm.FormClosed += delegate { this.Visible = true; };
+                this.Visible = false;
+                qcForm.Show();
             }
         }
     }

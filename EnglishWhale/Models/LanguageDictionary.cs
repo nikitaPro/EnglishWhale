@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EnglishWhale.Models
 {
-    class LanguageDictionary
+    public class LanguageDictionary
     {
         public string From { get; }
         public string To { get; }
@@ -33,6 +33,11 @@ namespace EnglishWhale.Models
         public bool ContainsKey(string key)
         {
             return Dict.ContainsKey(key);
+        }
+
+        public override string ToString()
+        {
+            return $"{From} -> {To}";
         }
     }
 }
