@@ -1,4 +1,5 @@
-﻿using EnglishWhale.Models;
+﻿using EnglishWhale.Controller;
+using EnglishWhale.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,14 +14,17 @@ namespace EnglishWhale
 {
     public partial class QuizzesChooserForm : Form
     {
-        public QuizzesChooserForm()
+        private MainController mContr;
+        public QuizzesChooserForm(MainController mContr)
         {
             InitializeComponent();
+            this.mContr = mContr;
         }
 
         private void chooseAnswerButton_Click(object sender, EventArgs e)
         {
-
+            LanguageDictionary languageDictionary = (LanguageDictionary)diretionComboBox.SelectedItem;
+            mContr.startChooseAnswerQuiz(languageDictionary);
         }
 
         public void Add(List<LanguageDictionary> listOfLanguageDictionries)
@@ -28,6 +32,10 @@ namespace EnglishWhale
             foreach(LanguageDictionary lDict in listOfLanguageDictionries)
             {
                 diretionComboBox.Items.Add(lDict);
+            }
+            if(diretionComboBox.Items.Count > 0)
+            {
+                diretionComboBox.SelectedIndex = 0;
             }
         }
 

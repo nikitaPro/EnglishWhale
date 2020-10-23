@@ -32,16 +32,16 @@
             this.diretionComboBox = new System.Windows.Forms.ComboBox();
             this.chooseAnswerButton = new System.Windows.Forms.Button();
             this.writeAnswerButton = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // diretionComboBox
             // 
-            this.diretionComboBox.FormattingEnabled = true;
+            this.diretionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.diretionComboBox.Location = new System.Drawing.Point(62, 12);
             this.diretionComboBox.Name = "diretionComboBox";
             this.diretionComboBox.Size = new System.Drawing.Size(171, 21);
             this.diretionComboBox.TabIndex = 0;
-            this.diretionComboBox.Text = "Select direction";
             // 
             // chooseAnswerButton
             // 
@@ -62,11 +62,21 @@
             this.writeAnswerButton.Text = "Write an answer";
             this.writeAnswerButton.UseVisualStyleBackColor = true;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 114);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(117, 55);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "Choose an answer (Time)";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // QuizzesChooserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(297, 450);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.writeAnswerButton);
             this.Controls.Add(this.chooseAnswerButton);
             this.Controls.Add(this.diretionComboBox);
@@ -82,5 +92,6 @@
         private System.Windows.Forms.ComboBox diretionComboBox;
         private System.Windows.Forms.Button chooseAnswerButton;
         private System.Windows.Forms.Button writeAnswerButton;
+        private System.Windows.Forms.Button button1;
     }
 }

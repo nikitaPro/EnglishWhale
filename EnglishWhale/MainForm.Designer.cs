@@ -47,10 +47,11 @@ namespace EnglishWhale
             this.selectButton.UseVisualStyleBackColor = true;
             this.selectButton.Click += new System.EventHandler(this.selectButton_Click);
             // 
-            // textBox1
+            // filePathTextBox
             // 
             this.filePathTextBox.Location = new System.Drawing.Point(83, 12);
-            this.filePathTextBox.Name = "textBox1";
+            this.filePathTextBox.Name = "filePathTextBox";
+            this.filePathTextBox.ReadOnly = true;
             this.filePathTextBox.Size = new System.Drawing.Size(447, 20);
             this.filePathTextBox.TabIndex = 1;
             // 
@@ -65,10 +66,10 @@ namespace EnglishWhale
             // 
             // startButton
             // 
+            this.startButton.Enabled = false;
             this.startButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.startButton.Location = new System.Drawing.Point(163, 38);
             this.startButton.Name = "startButton";
-            this.startButton.Enabled = false;
             this.startButton.Size = new System.Drawing.Size(318, 89);
             this.startButton.TabIndex = 3;
             this.startButton.Text = "Let\'s Start!";

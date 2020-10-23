@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller\MainController.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -61,6 +62,12 @@
     </Compile>
     <Compile Include="QuizzesChooserForm.Designer.cs">
       <DependentUpon>QuizzesChooserForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ChooseAnswerQuizForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChooseAnswerQuizForm.Designer.cs">
+      <DependentUpon>ChooseAnswerQuizForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Services\CsvReader.cs" />
     <EmbeddedResource Include="MainForm.resx">
@@ -77,6 +84,9 @@
     </Compile>
     <EmbeddedResource Include="QuizzesChooserForm.resx">
       <DependentUpon>QuizzesChooserForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChooseAnswerQuizForm.resx">
+      <DependentUpon>ChooseAnswerQuizForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

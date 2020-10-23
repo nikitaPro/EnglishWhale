@@ -8,24 +8,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EnglishWhale.Controller;
 using EnglishWhale.Services;
 
 namespace EnglishWhale
 {
     public partial class MainForm : Form
     {
-        private OpenFileDialog openFileDialog;
-        public MainForm()
+        private MainController mContr;
+        public MainForm(MainController mContr)
         {
             InitializeComponent();
-            openFileDialog = new OpenFileDialog();
+            this.mContr = mContr;
         }
 
         private void selectButton_Click(object sender, EventArgs e)
         {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            string csvPath = mContr.ChooseCSVFile();
+            if (csvPath  != null)
             {
-                filePathTextBox.Text = openFileDialog.FileName;
+                filePathTextBox.Text = csvPath;
                 startButton.Enabled = true;
             }
         }
@@ -33,16 +35,7 @@ namespace EnglishWhale
         private void startButton_Click(object sender, EventArgs e)
         {
             string path = filePathTextBox.Text;
-            CsvReader csvReader;
-            if (File.Exists(path))
-            {
-                csvReader = new CsvReader(path);
-                QuizzesChooserForm qcForm = new QuizzesChooserForm();
-                qcForm.Add(csvReader.Vocabularies);
-                qcForm.FormClosed += delegate { this.Visible = true; };
-                this.Visible = false;
-                qcForm.Show();
-            }
+            mContr.openQuizzesChooser(path, this);
         }
     }
 }

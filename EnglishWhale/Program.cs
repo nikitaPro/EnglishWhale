@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EnglishWhale.Controller;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +17,8 @@ namespace EnglishWhale
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            MainController mContr = new MainController();
+            Application.Run(new MainForm(mContr));
         }
     }
 }
