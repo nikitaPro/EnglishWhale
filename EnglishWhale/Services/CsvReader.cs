@@ -34,9 +34,10 @@ namespace EnglishWhale.Services
                 // read first row
                 string[] fields = csvParser.ReadFields();
                 // initiate dictionary with first row
-                directTranslation = new LanguageDictionary(fields[0], fields[1]);
+                EnglishDetector enDetector = new EnglishDetector(); // Detector for determining where English is.
+                directTranslation = new LanguageDictionary(fields[0], fields[1], enDetector);
                 directTranslation.Dict.Add(fields[2], fields[3]);
-                reversTranslation = new LanguageDictionary(fields[1], fields[0]);
+                reversTranslation = new LanguageDictionary(fields[1], fields[0], enDetector);
                 reversTranslation.Dict.Add(fields[3], fields[2]);
                 // let's process other rows
                 while (!csvParser.EndOfData)

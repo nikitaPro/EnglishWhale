@@ -1,8 +1,5 @@
-﻿using System;
+﻿using EnglishWhale.Services;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EnglishWhale.Models
 {
@@ -11,12 +8,23 @@ namespace EnglishWhale.Models
         public string From { get; }
         public string To { get; }
         public Dictionary<string, string> Dict { get; }
+        private string english;
+        public bool IsEnglishTo { get { return "to".Equals(english); } }
+        public bool IsEnglishFrom { get { return "from".Equals(english); } }
 
-        public LanguageDictionary(string from, string to)
+        public LanguageDictionary(string from, string to, EnglishDetector detector)
         {
             From = from;
             To = to;
             Dict = new Dictionary<string, string>();
+            whereIsEnglish(detector);
+        }
+
+        private void whereIsEnglish(EnglishDetector detector)
+        {
+            english = detector.isTheDirectionEnglish(To) 
+                ? "to" 
+                : (detector.isTheDirectionEnglish(From) ? "from" : null);
         }
 
         public string this[string s]
@@ -39,5 +47,6 @@ namespace EnglishWhale.Models
         {
             return $"{From} -> {To}";
         }
+
     }
 }

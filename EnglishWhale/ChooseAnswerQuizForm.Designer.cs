@@ -34,6 +34,8 @@
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.questionTextBox = new System.Windows.Forms.RichTextBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -79,18 +81,30 @@
             // questionTextBox
             // 
             this.questionTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.questionTextBox.Location = new System.Drawing.Point(12, 29);
+            this.questionTextBox.Location = new System.Drawing.Point(12, 46);
             this.questionTextBox.Name = "questionTextBox";
             this.questionTextBox.ReadOnly = true;
             this.questionTextBox.Size = new System.Drawing.Size(560, 132);
             this.questionTextBox.TabIndex = 5;
             this.questionTextBox.Text = "Text";
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::EnglishWhale.Properties.Resources.volume;
+            this.pictureBox1.InitialImage = null;
+            this.pictureBox1.Location = new System.Drawing.Point(12, 10);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(30, 30);
+            this.pictureBox1.TabIndex = 6;
+            this.pictureBox1.TabStop = false;
+            this.pictureBox1.MouseEnter += new System.EventHandler(this.volumePic_MouseEnter);
+            // 
             // ChooseAnswerQuizForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(584, 762);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.questionTextBox);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
@@ -99,6 +113,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ChooseAnswerQuizForm";
             this.Text = "Choose Answer Quiz";
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -109,5 +124,6 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.RichTextBox questionTextBox;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }

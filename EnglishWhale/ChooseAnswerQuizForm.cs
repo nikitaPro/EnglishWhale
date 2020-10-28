@@ -1,11 +1,7 @@
 ﻿using EnglishWhale.Controller;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,10 +10,15 @@ namespace EnglishWhale
     public partial class ChooseAnswerQuizForm : Form
     {
         private MainController mContr;
+        private Button rightAnswerBtn;
+        public bool MuteQuestion { get; set; }
+        public bool MuteAnswer { get; set; }
         public ChooseAnswerQuizForm(MainController mContr)
         {
             InitializeComponent();
             this.mContr = mContr;
+            MuteQuestion = true;
+            MuteAnswer = true;
         }
 
         public void setQuestion(string question)
@@ -34,8 +35,9 @@ namespace EnglishWhale
             Random rnd = new Random();
             int rightAnswerBtnPosition = rnd.Next(0, 3);
 
-            bList[rightAnswerBtnPosition].Text = rightAnswer;
-            bList[rightAnswerBtnPosition].Click += this.rightAnswer;
+            rightAnswerBtn = bList[rightAnswerBtnPosition];
+            rightAnswerBtn.Text = rightAnswer;
+            rightAnswerBtn.Click += this.rightAnswer;
             bList.RemoveAt(rightAnswerBtnPosition);
 
 
@@ -56,13 +58,15 @@ namespace EnglishWhale
 
         private void wrongAnswer(object sender, EventArgs e)
         {
-            this.BackColor = Color.Red;
+            Button wrongAnswerBtn = sender as Button;
+            wrongAnswerBtn.BackColor = Color.Red;
+            rightAnswerBtn.BackColor = Color.Green;
             Timer tm = new Timer();
-            tm.Interval = 500;
+            tm.Interval = 1000;
             tm.Tick += delegate {
                 this.Close();
                 this.Dispose();
-                mContr.wrongChooseAnswer();
+                mContr.WrongChooseAnswer();
                 tm.Stop();
                 tm.Dispose();
             };
@@ -71,17 +75,25 @@ namespace EnglishWhale
 
         private void rightAnswer(object sender, EventArgs e)
         {
-            this.BackColor = Color.Green;
+            Button rightAnswerBtn = sender as Button;
+            rightAnswerBtn.BackColor = Color.Green;
             Timer tm = new Timer();
             tm.Interval = 500;
             tm.Tick += delegate {
                 this.Close();
                 this.Dispose();
-                mContr.rightChooseAnswer();
+                mContr.RightChooseAnswer();
                 tm.Stop();
                 tm.Dispose();
             };
             tm.Start();
+        }
+
+        private void volumePic_MouseEnter(object sender, EventArgs e)
+        {
+            if (MuteQuestion) return;
+            string phrase = questionTextBox.Text;
+            mContr.SpeakThis(phrase);
         }
     }
 }
