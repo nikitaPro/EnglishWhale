@@ -18,7 +18,13 @@ namespace EnglishWhale
         private void chooseAnswerButton_Click(object sender, EventArgs e)
         {
             LanguageDictionary languageDictionary = (LanguageDictionary)diretionComboBox.SelectedItem;
-            mContr.StartChooseAnswerQuiz(languageDictionary);
+            mContr.StartChooseAnswerQuiz(languageDictionary, false);
+        }
+
+        private void chooseAnswerWithTimerButton_Click(object sender, EventArgs e)
+        {
+            LanguageDictionary languageDictionary = (LanguageDictionary)diretionComboBox.SelectedItem;
+            mContr.StartChooseAnswerQuiz(languageDictionary, true);
         }
 
         public void Add(List<LanguageDictionary> listOfLanguageDictionries)

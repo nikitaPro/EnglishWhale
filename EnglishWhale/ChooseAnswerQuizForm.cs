@@ -9,20 +9,72 @@ namespace EnglishWhale
 {
     public partial class ChooseAnswerQuizForm : Form
     {
+        private const int SECONDS = 10;
+        private int timeCounter;
+
         private MainController mContr;
         private Button rightAnswerBtn;
+        private Timer answerTimer;
         public bool MuteQuestion { get; set; }
         public bool MuteAnswer { get; set; }
-        public ChooseAnswerQuizForm(MainController mContr)
+        public ChooseAnswerQuizForm(MainController mContr, bool timer)
         {
             InitializeComponent();
             this.mContr = mContr;
             MuteQuestion = true;
             MuteAnswer = true;
+            setTimer(timer);
+            this.FormClosing += ChooseAnswerQuizForm_FormClosing;
+        }
+
+        private void ChooseAnswerQuizForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            stopAnswerTimer();
+        }
+
+        private void setTimer(bool isSet)
+        {
+            if (isSet)
+            {
+                timerBar.Maximum = SECONDS;
+                timeCounter = 0;
+                answerTimer = new Timer();
+                answerTimer.Interval = 1000;
+                answerTimer.Tick += timerHandler;
+                answerTimer.Start();
+            }
+            else
+            {
+                timerBar.Visible = false;
+                timerLabel.Visible = false;
+            }
+        }
+        private void stopAnswerTimer()
+        {
+            if (answerTimer != null)
+            {
+                answerTimer.Stop();
+                answerTimer.Dispose();
+            }
+        }
+        private void timerHandler(object sender, EventArgs e)
+        {
+            if (timeCounter == SECONDS)
+            {
+                wrongAnswer(this, null);
+                stopAnswerTimer();
+                return;
+            }
+            timeCounter++;
+            timerBar.Value = timeCounter;
         }
 
         public void setQuestion(string question)
         {
+            if (!MuteQuestion)
+            {
+                mContr.SpeakThis(question);
+            }
             questionTextBox.Text = question;
             questionTextBox.SelectAll();
             questionTextBox.SelectionAlignment = HorizontalAlignment.Center;
@@ -38,6 +90,7 @@ namespace EnglishWhale
             rightAnswerBtn = bList[rightAnswerBtnPosition];
             rightAnswerBtn.Text = rightAnswer;
             rightAnswerBtn.Click += this.rightAnswer;
+            rightAnswerBtn.MouseEnter += volumeFromButton_MouseEnter;
             bList.RemoveAt(rightAnswerBtnPosition);
 
 
@@ -45,20 +98,23 @@ namespace EnglishWhale
             Button button = queueButtons.Dequeue();
             button.Text = answer2;
             button.Click += wrongAnswer;
+            button.MouseEnter += volumeFromButton_MouseEnter;
 
             button = queueButtons.Dequeue();
             button.Text = answer3;
             button.Click += wrongAnswer;
+            button.MouseEnter += volumeFromButton_MouseEnter;
 
             button = queueButtons.Dequeue();
             button.Text = answer4;
             button.Click += wrongAnswer;
-
+            button.MouseEnter += volumeFromButton_MouseEnter;
         }
 
         private void wrongAnswer(object sender, EventArgs e)
         {
-            Button wrongAnswerBtn = sender as Button;
+            stopAnswerTimer();
+            Control wrongAnswerBtn = sender as Control;
             wrongAnswerBtn.BackColor = Color.Red;
             rightAnswerBtn.BackColor = Color.Green;
             Timer tm = new Timer();
@@ -71,10 +127,15 @@ namespace EnglishWhale
                 tm.Dispose();
             };
             tm.Start();
+            if (!MuteAnswer)
+            {
+                mContr.SpeakThis(rightAnswerBtn.Text);
+            }
         }
 
         private void rightAnswer(object sender, EventArgs e)
         {
+            stopAnswerTimer();
             Button rightAnswerBtn = sender as Button;
             rightAnswerBtn.BackColor = Color.Green;
             Timer tm = new Timer();
@@ -87,12 +148,24 @@ namespace EnglishWhale
                 tm.Dispose();
             };
             tm.Start();
+            if (!MuteQuestion)
+            {
+                mContr.SpeakThis(questionTextBox.Text);
+            }
         }
 
         private void volumePic_MouseEnter(object sender, EventArgs e)
         {
             if (MuteQuestion) return;
             string phrase = questionTextBox.Text;
+            mContr.SpeakThis(phrase);
+        }
+
+        private void volumeFromButton_MouseEnter(object sender, EventArgs e)
+        {
+            if (MuteAnswer) return;
+            Button btn = sender as Button;
+            string phrase = btn.Text;
             mContr.SpeakThis(phrase);
         }
     }

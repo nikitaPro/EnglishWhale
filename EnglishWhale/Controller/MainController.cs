@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 using WMPLib;
@@ -15,18 +16,19 @@ namespace EnglishWhale.Controller
 {
     public class MainController
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private string tempPathForAudio;
         private LanguageDictionary currentDictionary;
         private WindowsMediaPlayer wplayer;
+        private bool isTimerNeeded;
         IDownloader downloader;
         public MainController()
         {
             tempPathForAudio = Path.Combine(Path.GetTempPath(), @"audio");
-            Console.WriteLine(tempPathForAudio);
             downloader = new DownloaderBufferedProxy();
         }
 
-        public string  ChooseCSVFile()
+        public string ChooseCSVFile()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "(*.csv)|*.csv";
@@ -58,10 +60,11 @@ namespace EnglishWhale.Controller
             }
         }
 
-        public void StartChooseAnswerQuiz(LanguageDictionary languageDictionary)
+        public void StartChooseAnswerQuiz(LanguageDictionary languageDictionary, bool timer)
         {
+            isTimerNeeded = timer;
             currentDictionary = languageDictionary;
-            ChooseAnswerQuizForm qcForm = new ChooseAnswerQuizForm(this);
+            ChooseAnswerQuizForm qcForm = new ChooseAnswerQuizForm(this, timer);
             if (currentDictionary.IsEnglishFrom)
             {
                 qcForm.MuteQuestion = false;
@@ -95,41 +98,61 @@ namespace EnglishWhale.Controller
 
         public void WrongChooseAnswer()
         {
-            StartChooseAnswerQuiz(currentDictionary);
+            StartChooseAnswerQuiz(currentDictionary, isTimerNeeded);
         }
         public void RightChooseAnswer()
         {
-            StartChooseAnswerQuiz(currentDictionary);
+            StartChooseAnswerQuiz(currentDictionary, isTimerNeeded);
         }
 
         public void SpeakThis(string phrase)
         {
+            string voicePath;
+            try
+            {
+                voicePath = downloader.DownloadVoice(phrase, tempPathForAudio);
+            }
+            catch (WebException ex)
+            {
+                Logger.Error(ex, "Unable to download voice.");
+                return;
+            }
 
-            string voicePath = downloader.DownloadVoice(phrase, tempPathForAudio);
+            WaitingStopPlayer();
+            PlayVoiceFile(voicePath);
+        }
+        private void PlayVoiceFile(string voicePath)
+        {
+            wplayer = new WindowsMediaPlayer();
 
+            wplayer.URL = voicePath;
+            IWMPControls3 controls = (IWMPControls3)wplayer.controls;
+            controls.play();
+
+            wplayer.PlayStateChange += new _WMPOCXEvents_PlayStateChangeEventHandler(Wplayer_StatusChange);
+            wplayer.MediaError += new _WMPOCXEvents_MediaErrorEventHandler(Player_MediaError);
+        }
+        private void WaitingStopPlayer()
+        {
             IWMPControls3 controls;
             if (wplayer != null)
             {
                 do
                 {
                     controls = (IWMPControls3)wplayer.controls;
-                    if (controls.get_isAvailable("stop"))
-                    {
-                        controls.stop();
-                    }
+                    double lastPosition = controls.currentPosition;
                     Thread.Sleep(100);
+                    bool payngPositionChanged = (controls.currentPosition - lastPosition) > 0.001;
+                    if (!payngPositionChanged)
+                    {
+                        if (controls.get_isAvailable("stop"))
+                        {
+                            controls.stop();
+                        }
+                    }
                 } while (wplayer.playState == WMPPlayState.wmppsPlaying);
-                
+
             }
-            wplayer = new WindowsMediaPlayer();
-
-            wplayer.URL = voicePath;
-            controls = (IWMPControls3)wplayer.controls;
-            controls.play();
-
-            wplayer.PlayStateChange += new _WMPOCXEvents_PlayStateChangeEventHandler(Wplayer_StatusChange);
-            wplayer.MediaError += new _WMPOCXEvents_MediaErrorEventHandler(Player_MediaError);
-
         }
 
         private void Wplayer_StatusChange(int newState)

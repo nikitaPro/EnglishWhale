@@ -10,16 +10,23 @@ namespace EnglishWhale.Services.DownloadService.Implementation
 {
     public class DownloaderBufferedProxy : IDownloader
     {
-        private string phraseBuff;
-        private string voicePath;
-        private IDownloader downloader;
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        private string phraseBuffNorm;
+        private string phraseBuffSlow;
+        private string voicePathNorm;
+        private string voicePathSlow;
+        private IDownloader downloaderNorm;
+        private IDownloader downloaderSlow;
         private Thread fileCleaner;
         private Queue<string> garbageQueue;
+        private bool speedSwitcher;
 
         public DownloaderBufferedProxy()
         {
-            downloader = new Downloader();
+            downloaderNorm = new Downloader(1.0);
+            downloaderSlow = new Downloader(0.24);
             garbageQueue = new Queue<string>();
+            speedSwitcher = false;
         }
 
         public string DownloadVoice(string phrase, string folder)
@@ -33,24 +40,15 @@ namespace EnglishWhale.Services.DownloadService.Implementation
                 folder = String.Empty;
             }
 
-            if (!phrase.Equals(phraseBuff) || !File.Exists(voicePath))
-            {
-                phraseBuff = phrase;
-                garbageQueue.Enqueue(voicePath);
-                voicePath = downloader.DownloadVoice(phrase, folder);
-                if (fileCleaner == null)
-                {
-                    fileCleaner = new Thread(DeleteFilesAsSoonAsPossible);
-                    fileCleaner.Start();
-                }
-            }
-            
-            return voicePath;
+            speedSwitcher = !speedSwitcher;
+            return speedSwitcher 
+                ? Download(phrase, ref phraseBuffNorm, ref voicePathNorm, folder, downloaderNorm) 
+                : Download(phrase, ref phraseBuffSlow, ref voicePathSlow, folder, downloaderSlow);
 
         }
 
         private int counter;
-        private const int MAX_ATTEMPTS = 200;
+        private const int MAX_ATTEMPTS = 50;
         private void DeleteFilesAsSoonAsPossible()
         {
             counter = 0;
@@ -59,7 +57,7 @@ namespace EnglishWhale.Services.DownloadService.Implementation
                 if (counter > MAX_ATTEMPTS)
                 {
                     fileCleaner = null;
-                    Console.WriteLine("Exit attempts run out");
+                    Logger.Trace("Exit attempts run out");
                     return;
                 }
                 counter++;
@@ -79,16 +77,33 @@ namespace EnglishWhale.Services.DownloadService.Implementation
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.StackTrace);
                     garbageQueue.Enqueue(filePath);
                 }
             }
-            Console.WriteLine("Exit with empty queue");
+            Logger.Trace("Exit with empty queue");
             fileCleaner = null;
+        }
+
+        private string Download(string phrase, ref string phraseBuff, ref string voicePath, string folder, IDownloader downloader)
+        {
+            if (!phrase.Equals(phraseBuff) || !File.Exists(voicePath))
+            {
+                phraseBuff = phrase;
+                garbageQueue.Enqueue(voicePath);
+                voicePath = downloader.DownloadVoice(phrase, folder);
+                if (fileCleaner == null)
+                {
+                    fileCleaner = new Thread(DeleteFilesAsSoonAsPossible);
+                    fileCleaner.Start();
+                }
+            }
+
+            return voicePath;
         }
         ~DownloaderBufferedProxy()
         {
-            garbageQueue.Enqueue(voicePath);
+            garbageQueue.Enqueue(voicePathNorm);
+            garbageQueue.Enqueue(voicePathSlow);
             DeleteFilesAsSoonAsPossible();
         }
     }

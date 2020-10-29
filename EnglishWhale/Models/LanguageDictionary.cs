@@ -5,6 +5,7 @@ namespace EnglishWhale.Models
 {
     public class LanguageDictionary
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public string From { get; }
         public string To { get; }
         public Dictionary<string, string> Dict { get; }
@@ -22,9 +23,17 @@ namespace EnglishWhale.Models
 
         private void whereIsEnglish(EnglishDetector detector)
         {
-            english = detector.isTheDirectionEnglish(To) 
-                ? "to" 
-                : (detector.isTheDirectionEnglish(From) ? "from" : null);
+            try
+            {
+                english = detector.isTheDirectionEnglish(To)
+                    ? "to"
+                    : (detector.isTheDirectionEnglish(From) ? "from" : null);
+            }
+            catch (System.Exception)
+            {
+                english = null;
+                Logger.Error("Fail when detector trying to determine english language.");
+            }
         }
 
         public string this[string s]

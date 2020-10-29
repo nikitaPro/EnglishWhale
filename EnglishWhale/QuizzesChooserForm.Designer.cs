@@ -70,6 +70,7 @@
             this.button1.TabIndex = 3;
             this.button1.Text = "Choose an answer (Time)";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.chooseAnswerWithTimerButton_Click);
             // 
             // QuizzesChooserForm
             // 
@@ -80,6 +81,7 @@
             this.Controls.Add(this.writeAnswerButton);
             this.Controls.Add(this.chooseAnswerButton);
             this.Controls.Add(this.diretionComboBox);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "QuizzesChooserForm";
             this.Text = "English Whale";

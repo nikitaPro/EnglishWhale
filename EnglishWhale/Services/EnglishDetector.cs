@@ -8,6 +8,7 @@ namespace EnglishWhale.Services
 {
     public class EnglishDetector
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private const string TEMPLATE_HTTPS = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q={0}";
         private WebClient web;
         public EnglishDetector()
@@ -30,7 +31,16 @@ namespace EnglishWhale.Services
             }
 
             string restQuery = String.Format(TEMPLATE_HTTPS, translateDirection);
-            string translationJson = web.DownloadString(restQuery);
+            string translationJson;
+            try
+            {
+                translationJson = web.DownloadString(restQuery);
+            }
+            catch (WebException ex)
+            {
+                Logger.Error(ex, "Unable determine the language, because web request failed.");
+                throw;
+            }
 
             List<dynamic> jsonData = JsonConvert.DeserializeObject<List<dynamic>>(translationJson);
             string language = jsonData[0][0][0];

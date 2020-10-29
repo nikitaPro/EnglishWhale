@@ -16,7 +16,7 @@ namespace EnglishWhale
     static class Program
     {
         /// <summary>
-        /// Главная точка входа для приложения.
+        /// The main entry point to the application 
         /// </summary>
         [STAThread]
         static void Main()

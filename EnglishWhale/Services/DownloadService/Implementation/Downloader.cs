@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Net;
 
@@ -7,9 +8,11 @@ namespace EnglishWhale.Services.DownloadService.Implementation
     public class Downloader : IDownloader
     {
         private WebClient webClient;
-        public Downloader()
+        private Double speed;
+        public Downloader(Double speechSpeed)
         {
             webClient = new WebClient();
+            speed = speechSpeed;
         }
         public string DownloadVoice(string phrase, string folder)
         {
@@ -33,7 +36,7 @@ namespace EnglishWhale.Services.DownloadService.Implementation
                 filePath = Path.Combine(folder, fileName);
             } while (File.Exists(filePath));
             
-            webClient.DownloadFile(String.Format("https://translate.google.com.vn/translate_tts?ie=UTF-8&q={0}&tl=en&client=tw-ob", phrase), filePath);
+            webClient.DownloadFile(String.Format("https://translate.google.com.vn/translate_tts?ie=UTF-8&q={0}&tl=en&client=tw-ob&ttsspeed={1}", phrase, speed.ToString("F2", CultureInfo.CreateSpecificCulture("en-GB"))), filePath);
             return filePath;
         }
 
