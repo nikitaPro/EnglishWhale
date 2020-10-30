@@ -61,6 +61,7 @@
             this.writeAnswerButton.TabIndex = 2;
             this.writeAnswerButton.Text = "Write an answer";
             this.writeAnswerButton.UseVisualStyleBackColor = true;
+            this.writeAnswerButton.Click += new System.EventHandler(this.writeAnswerButton_Click);
             // 
             // button1
             // 

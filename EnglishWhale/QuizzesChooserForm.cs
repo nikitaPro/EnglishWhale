@@ -39,5 +39,12 @@ namespace EnglishWhale
             }
         }
 
+        private void writeAnswerButton_Click(object sender, EventArgs e)
+        {
+            LanguageDictionary languageDictionary = (LanguageDictionary)diretionComboBox.SelectedItem;
+            mContr.StartWrittenQuiz(languageDictionary);
+            
+        }
+
     }
 }

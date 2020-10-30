@@ -62,7 +62,6 @@ namespace EnglishWhale
             if (timeCounter == SECONDS)
             {
                 wrongAnswer(this, null);
-                stopAnswerTimer();
                 return;
             }
             timeCounter++;
@@ -114,11 +113,13 @@ namespace EnglishWhale
         private void wrongAnswer(object sender, EventArgs e)
         {
             stopAnswerTimer();
+            makeAllButtonsDisabled();
+
             Control wrongAnswerBtn = sender as Control;
             wrongAnswerBtn.BackColor = Color.Red;
             rightAnswerBtn.BackColor = Color.Green;
             Timer tm = new Timer();
-            tm.Interval = 1000;
+            tm.Interval = 2000;
             tm.Tick += delegate {
                 this.Close();
                 this.Dispose();
@@ -136,6 +137,8 @@ namespace EnglishWhale
         private void rightAnswer(object sender, EventArgs e)
         {
             stopAnswerTimer();
+            makeAllButtonsDisabled();
+
             Button rightAnswerBtn = sender as Button;
             rightAnswerBtn.BackColor = Color.Green;
             Timer tm = new Timer();
@@ -168,5 +171,13 @@ namespace EnglishWhale
             string phrase = btn.Text;
             mContr.SpeakThis(phrase);
         }
+
+        private void makeAllButtonsDisabled()
+        {
+            button1.Enabled = false;
+            button2.Enabled = false;
+            button3.Enabled = false;
+            button4.Enabled = false;
+        } 
     }
 }

@@ -93,6 +93,12 @@
     <Compile Include="Services\DownloadService\Implementation\Downloader.cs" />
     <Compile Include="Services\DownloadService\Implementation\DownloaderBufferedProxy.cs" />
     <Compile Include="Services\EnglishDetector.cs" />
+    <Compile Include="WrittenQuizForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WrittenQuizForm.Designer.cs">
+      <DependentUpon>WrittenQuizForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -115,6 +121,9 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="WrittenQuizForm.resx">
+      <DependentUpon>WrittenQuizForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -132,7 +141,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="View\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="images\volume.png" />
   </ItemGroup>

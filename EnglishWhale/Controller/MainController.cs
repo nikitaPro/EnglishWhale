@@ -21,11 +21,13 @@ namespace EnglishWhale.Controller
         private LanguageDictionary currentDictionary;
         private WindowsMediaPlayer wplayer;
         private bool isTimerNeeded;
+        private Random rnd;
         IDownloader downloader;
         public MainController()
         {
             tempPathForAudio = Path.Combine(Path.GetTempPath(), @"audio");
             downloader = new DownloaderBufferedProxy();
+            rnd = new Random();
         }
 
         public string ChooseCSVFile()
@@ -60,6 +62,18 @@ namespace EnglishWhale.Controller
             }
         }
 
+        internal void StartWrittenQuiz(LanguageDictionary languageDictionary)
+        {
+            currentDictionary = languageDictionary;
+            new WrittenQuizForm(this).Show();
+        }
+
+        internal KeyValuePair<string, string> getRamdomWordsPair()
+        {
+            int testPairNumber = rnd.Next(0, currentDictionary.Dict.Count);
+            return currentDictionary.Dict.ElementAt(testPairNumber);
+        }
+
         public void StartChooseAnswerQuiz(LanguageDictionary languageDictionary, bool timer)
         {
             isTimerNeeded = timer;
@@ -74,7 +88,6 @@ namespace EnglishWhale.Controller
                 qcForm.MuteAnswer = false;
             }
 
-            Random rnd = new Random();
             int testPairNumber = rnd.Next(0, languageDictionary.Dict.Count);
             KeyValuePair<string, string> testPair = languageDictionary.Dict.ElementAt(testPairNumber);
             string question = testPair.Key;
@@ -94,6 +107,19 @@ namespace EnglishWhale.Controller
             qcForm.setQuestion(question);
             qcForm.setAnswers(rightAnswer, wrongs[0], wrongs[1], wrongs[2]);
             qcForm.Show();
+        }
+
+        public bool isRightAnswer(string rightAnswer, string userAnswer)
+        {
+            string[] answers = rightAnswer.Split(';');
+            foreach (string rightAns in answers)
+            {
+                if (rightAns.Trim().ToLower().Equals(userAnswer))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void WrongChooseAnswer()
