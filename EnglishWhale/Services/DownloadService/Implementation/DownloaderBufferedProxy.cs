@@ -19,14 +19,14 @@ namespace EnglishWhale.Services.DownloadService.Implementation
         private IDownloader downloaderSlow;
         private Thread fileCleaner;
         private Queue<string> garbageQueue;
-        private bool speedSwitcher;
+        private bool speakFast;
 
         public DownloaderBufferedProxy()
         {
             downloaderNorm = new Downloader(1.0);
             downloaderSlow = new Downloader(0.24);
             garbageQueue = new Queue<string>();
-            speedSwitcher = false;
+            speakFast = true;
         }
 
         public string DownloadVoice(string phrase, string folder)
@@ -40,8 +40,9 @@ namespace EnglishWhale.Services.DownloadService.Implementation
                 folder = String.Empty;
             }
 
-            speedSwitcher = !speedSwitcher;
-            return speedSwitcher 
+            speakFast = phrase.Equals(phraseBuffNorm) ? !speakFast : true;
+
+            return speakFast 
                 ? Download(phrase, ref phraseBuffNorm, ref voicePathNorm, folder, downloaderNorm) 
                 : Download(phrase, ref phraseBuffSlow, ref voicePathSlow, folder, downloaderSlow);
 

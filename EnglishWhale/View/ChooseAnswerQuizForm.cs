@@ -1,4 +1,6 @@
 ﻿using EnglishWhale.Controller;
+using EnglishWhale.Models;
+using EnglishWhale.View;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,7 +9,7 @@ using System.Windows.Forms;
 
 namespace EnglishWhale
 {
-    public partial class ChooseAnswerQuizForm : Form
+    public partial class ChooseAnswerQuizForm : Form, IMute
     {
         private const int SECONDS = 10;
         private int timeCounter;
@@ -23,16 +25,17 @@ namespace EnglishWhale
             this.mContr = mContr;
             MuteQuestion = true;
             MuteAnswer = true;
-            setTimer(timer);
+            SetTimer(timer);
             this.FormClosing += ChooseAnswerQuizForm_FormClosing;
+            GetQuestionAndAnswers();
         }
 
         private void ChooseAnswerQuizForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            stopAnswerTimer();
+            StopAnswerTimer();
         }
 
-        private void setTimer(bool isSet)
+        private void SetTimer(bool isSet)
         {
             if (isSet)
             {
@@ -40,7 +43,7 @@ namespace EnglishWhale
                 timeCounter = 0;
                 answerTimer = new Timer();
                 answerTimer.Interval = 1000;
-                answerTimer.Tick += timerHandler;
+                answerTimer.Tick += TimerHandler;
                 answerTimer.Start();
             }
             else
@@ -49,7 +52,7 @@ namespace EnglishWhale
                 timerLabel.Visible = false;
             }
         }
-        private void stopAnswerTimer()
+        private void StopAnswerTimer()
         {
             if (answerTimer != null)
             {
@@ -57,18 +60,18 @@ namespace EnglishWhale
                 answerTimer.Dispose();
             }
         }
-        private void timerHandler(object sender, EventArgs e)
+        private void TimerHandler(object sender, EventArgs e)
         {
             if (timeCounter == SECONDS)
             {
-                wrongAnswer(this, null);
+                WrongAnswer(this, null);
                 return;
             }
             timeCounter++;
             timerBar.Value = timeCounter;
         }
 
-        public void setQuestion(string question)
+        private void SetQuestion(string question)
         {
             if (!MuteQuestion)
             {
@@ -77,9 +80,10 @@ namespace EnglishWhale
             questionTextBox.Text = question;
             questionTextBox.SelectAll();
             questionTextBox.SelectionAlignment = HorizontalAlignment.Center;
+            questionTextBox.DeselectAll();
         }
 
-        public void setAnswers(string rightAnswer, string answer2, string answer3, string answer4)
+        private void SetAnswers(string rightAnswer, string answer2, string answer3, string answer4)
         {
             List<Button> bList = new List<Button>() { button1, button2, button3, button4 };
 
@@ -88,32 +92,33 @@ namespace EnglishWhale
 
             rightAnswerBtn = bList[rightAnswerBtnPosition];
             rightAnswerBtn.Text = rightAnswer;
-            rightAnswerBtn.Click += this.rightAnswer;
-            rightAnswerBtn.MouseEnter += volumeFromButton_MouseEnter;
+            rightAnswerBtn.Click += this.RightAnswer;
+            rightAnswerBtn.MouseEnter += VolumeFromButton_MouseEnter;
             bList.RemoveAt(rightAnswerBtnPosition);
 
 
             Queue<Button> queueButtons = new Queue<Button>(bList);
             Button button = queueButtons.Dequeue();
             button.Text = answer2;
-            button.Click += wrongAnswer;
-            button.MouseEnter += volumeFromButton_MouseEnter;
+            button.Click += WrongAnswer;
+            button.MouseEnter += VolumeFromButton_MouseEnter;
 
             button = queueButtons.Dequeue();
             button.Text = answer3;
-            button.Click += wrongAnswer;
-            button.MouseEnter += volumeFromButton_MouseEnter;
+            button.Click += WrongAnswer;
+            button.MouseEnter += VolumeFromButton_MouseEnter;
 
             button = queueButtons.Dequeue();
             button.Text = answer4;
-            button.Click += wrongAnswer;
-            button.MouseEnter += volumeFromButton_MouseEnter;
+            button.Click += WrongAnswer;
+            button.MouseEnter += VolumeFromButton_MouseEnter;
+            this.Refresh();
         }
 
-        private void wrongAnswer(object sender, EventArgs e)
+        private void WrongAnswer(object sender, EventArgs e)
         {
-            stopAnswerTimer();
-            makeAllButtonsDisabled();
+            StopAnswerTimer();
+            MakeAllButtonsDisabled();
 
             Control wrongAnswerBtn = sender as Control;
             wrongAnswerBtn.BackColor = Color.Red;
@@ -121,10 +126,8 @@ namespace EnglishWhale
             Timer tm = new Timer();
             tm.Interval = 2000;
             tm.Tick += delegate {
-                this.Close();
-                this.Dispose();
-                mContr.WrongChooseAnswer();
                 tm.Stop();
+                ResetForm();
                 tm.Dispose();
             };
             tm.Start();
@@ -134,20 +137,18 @@ namespace EnglishWhale
             }
         }
 
-        private void rightAnswer(object sender, EventArgs e)
+        private void RightAnswer(object sender, EventArgs e)
         {
-            stopAnswerTimer();
-            makeAllButtonsDisabled();
+            StopAnswerTimer();
+            MakeAllButtonsDisabled();
 
             Button rightAnswerBtn = sender as Button;
             rightAnswerBtn.BackColor = Color.Green;
             Timer tm = new Timer();
-            tm.Interval = 500;
+            tm.Interval = 1000;
             tm.Tick += delegate {
-                this.Close();
-                this.Dispose();
-                mContr.RightChooseAnswer();
                 tm.Stop();
+                ResetForm();
                 tm.Dispose();
             };
             tm.Start();
@@ -157,14 +158,14 @@ namespace EnglishWhale
             }
         }
 
-        private void volumePic_MouseEnter(object sender, EventArgs e)
+        private void VolumePic_MouseEnter(object sender, EventArgs e)
         {
             if (MuteQuestion) return;
             string phrase = questionTextBox.Text;
             mContr.SpeakThis(phrase);
         }
 
-        private void volumeFromButton_MouseEnter(object sender, EventArgs e)
+        private void VolumeFromButton_MouseEnter(object sender, EventArgs e)
         {
             if (MuteAnswer) return;
             Button btn = sender as Button;
@@ -172,12 +173,42 @@ namespace EnglishWhale
             mContr.SpeakThis(phrase);
         }
 
-        private void makeAllButtonsDisabled()
+        private void MakeAllButtonsDisabled()
         {
             button1.Enabled = false;
             button2.Enabled = false;
             button3.Enabled = false;
             button4.Enabled = false;
         } 
+        private void ResetButtons()
+        {
+            this.Controls.Remove(GetButton4());
+            this.Controls.Remove(GetButton3());
+            this.Controls.Remove(GetButton2());
+            this.Controls.Remove(GetButton1());
+
+            button1 = null;
+            button2 = null;
+            button3 = null;
+            button4 = null;
+
+            this.Controls.Add(GetButton4());
+            this.Controls.Add(GetButton3());
+            this.Controls.Add(GetButton2());
+            this.Controls.Add(GetButton1());
+        }
+
+        private void ResetForm()
+        {
+            ResetButtons();
+            GetQuestionAndAnswers();
+        }
+
+        private void GetQuestionAndAnswers()
+        {
+            QuizWithAnswers quiz = mContr.GetNewChooseAnswerQuiz();
+            SetQuestion(quiz.Question);
+            SetAnswers(quiz.RightAnswer, quiz.Answer2, quiz.Answer3, quiz.Answer4);
+        }
     }
 }

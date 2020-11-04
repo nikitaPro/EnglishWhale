@@ -3,11 +3,13 @@ using EnglishWhale.Models;
 using EnglishWhale.Services;
 using EnglishWhale.Services.DownloadService;
 using EnglishWhale.Services.DownloadService.Implementation;
+using EnglishWhale.View;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using WMPLib;
@@ -62,73 +64,52 @@ namespace EnglishWhale.Controller
             }
         }
 
-        internal void StartWrittenQuiz(LanguageDictionary languageDictionary)
+        public void StartWrittenQuiz(LanguageDictionary languageDictionary, Form parentForm)
         {
+            parentForm.Visible = false;
             currentDictionary = languageDictionary;
-            new WrittenQuizForm(this).Show();
+            WrittenQuizForm form = new WrittenQuizForm(this);
+            form.FormClosing += delegate { parentForm.Visible = true; };
+            SetMutes(form);
+            form.Show();
         }
 
-        internal KeyValuePair<string, string> getRamdomWordsPair()
+        private void SetMutes(IMute form)
+        {
+            form.MuteAnswer = currentDictionary.IsEnglishFrom;
+            form.MuteQuestion = currentDictionary.IsEnglishTo;
+        }
+
+        public KeyValuePair<string, string> getRamdomWordsPair()
         {
             int testPairNumber = rnd.Next(0, currentDictionary.Dict.Count);
             return currentDictionary.Dict.ElementAt(testPairNumber);
         }
 
-        public void StartChooseAnswerQuiz(LanguageDictionary languageDictionary, bool timer)
+        public void StartChooseAnswerQuiz(LanguageDictionary languageDictionary, bool timer, Form parentForm)
         {
             isTimerNeeded = timer;
             currentDictionary = languageDictionary;
             ChooseAnswerQuizForm qcForm = new ChooseAnswerQuizForm(this, timer);
-            if (currentDictionary.IsEnglishFrom)
-            {
-                qcForm.MuteQuestion = false;
-            } 
-            else if (currentDictionary.IsEnglishTo)
-            {
-                qcForm.MuteAnswer = false;
-            }
+            SetMutes(qcForm);
+            qcForm.FormClosing += delegate { parentForm.Visible = true; };
+            parentForm.Visible = false;
 
-            int testPairNumber = rnd.Next(0, languageDictionary.Dict.Count);
-            KeyValuePair<string, string> testPair = languageDictionary.Dict.ElementAt(testPairNumber);
-            string question = testPair.Key;
-            string rightAnswer = testPair.Value;
-            string[] wrongs = new string[3];
-            for (int i = 0; i < 3; i++)
-            {
-                int wrongPairNumber;
-                do
-                {
-                    wrongPairNumber = rnd.Next(0, languageDictionary.Dict.Count);
-                } while (wrongPairNumber == testPairNumber);
-
-                KeyValuePair<string, string> wrongPair = languageDictionary.Dict.ElementAt(wrongPairNumber);
-                wrongs[i] = wrongPair.Value;
-            }
-            qcForm.setQuestion(question);
-            qcForm.setAnswers(rightAnswer, wrongs[0], wrongs[1], wrongs[2]);
             qcForm.Show();
         }
 
         public bool isRightAnswer(string rightAnswer, string userAnswer)
         {
+            rightAnswer = Regex.Replace(rightAnswer, @"\.|,|\(.*?\)", "");
             string[] answers = rightAnswer.Split(';');
             foreach (string rightAns in answers)
             {
-                if (rightAns.Trim().ToLower().Equals(userAnswer))
+                if (rightAns.Trim().Replace(".", "").ToLower().Equals(userAnswer))
                 {
                     return true;
                 }
             }
             return false;
-        }
-
-        public void WrongChooseAnswer()
-        {
-            StartChooseAnswerQuiz(currentDictionary, isTimerNeeded);
-        }
-        public void RightChooseAnswer()
-        {
-            StartChooseAnswerQuiz(currentDictionary, isTimerNeeded);
         }
 
         public void SpeakThis(string phrase)
@@ -179,6 +160,28 @@ namespace EnglishWhale.Controller
                 } while (wplayer.playState == WMPPlayState.wmppsPlaying);
 
             }
+        }
+
+        public QuizWithAnswers GetNewChooseAnswerQuiz()
+        {
+            int testPairNumber = rnd.Next(0, currentDictionary.Dict.Count);
+            KeyValuePair<string, string> testPair = currentDictionary.Dict.ElementAt(testPairNumber);
+            string question = testPair.Key;
+            string rightAnswer = testPair.Value;
+            string[] wrongs = new string[3];
+            for (int i = 0; i < 3; i++)
+            {
+                int wrongPairNumber;
+                do
+                {
+                    wrongPairNumber = rnd.Next(0, currentDictionary.Dict.Count);
+                } while (wrongPairNumber == testPairNumber);
+
+                KeyValuePair<string, string> wrongPair = currentDictionary.Dict.ElementAt(wrongPairNumber);
+                wrongs[i] = wrongPair.Value;
+            }
+            QuizWithAnswers quiz = new QuizWithAnswers(question, rightAnswer, wrongs[0], wrongs[1], wrongs[2]);
+            return quiz;
         }
 
         private void Wplayer_StatusChange(int newState)

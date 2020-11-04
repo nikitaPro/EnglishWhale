@@ -67,25 +67,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller\MainController.cs" />
-    <Compile Include="MainForm.cs">
+    <Compile Include="Models\QuizWithAnswers.cs" />
+    <Compile Include="View\IMute.cs" />
+    <Compile Include="View\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainForm.Designer.cs">
+    <Compile Include="View\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\LanguageDictionary.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QuizzesChooserForm.cs">
+    <Compile Include="View\QuizzesChooserForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="QuizzesChooserForm.Designer.cs">
+    <Compile Include="View\QuizzesChooserForm.Designer.cs">
       <DependentUpon>QuizzesChooserForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ChooseAnswerQuizForm.cs">
+    <Compile Include="View\ChooseAnswerQuizForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ChooseAnswerQuizForm.Designer.cs">
+    <Compile Include="View\ChooseAnswerQuizForm.Designer.cs">
       <DependentUpon>ChooseAnswerQuizForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Services\CsvReader.cs" />
@@ -93,13 +95,13 @@
     <Compile Include="Services\DownloadService\Implementation\Downloader.cs" />
     <Compile Include="Services\DownloadService\Implementation\DownloaderBufferedProxy.cs" />
     <Compile Include="Services\EnglishDetector.cs" />
-    <Compile Include="WrittenQuizForm.cs">
+    <Compile Include="View\WrittenQuizForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="WrittenQuizForm.Designer.cs">
+    <Compile Include="View\WrittenQuizForm.Designer.cs">
       <DependentUpon>WrittenQuizForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="MainForm.resx">
+    <EmbeddedResource Include="View\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -112,16 +114,16 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="QuizzesChooserForm.resx">
+    <EmbeddedResource Include="View\QuizzesChooserForm.resx">
       <DependentUpon>QuizzesChooserForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ChooseAnswerQuizForm.resx">
+    <EmbeddedResource Include="View\ChooseAnswerQuizForm.resx">
       <DependentUpon>ChooseAnswerQuizForm.cs</DependentUpon>
     </EmbeddedResource>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="WrittenQuizForm.resx">
+    <EmbeddedResource Include="View\WrittenQuizForm.resx">
       <DependentUpon>WrittenQuizForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="NLog.xsd">
@@ -141,9 +143,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="View\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="images\volume.png" />
   </ItemGroup>

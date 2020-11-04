@@ -1,4 +1,5 @@
 ﻿using EnglishWhale.Controller;
+using EnglishWhale.View;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,17 +12,21 @@ using System.Windows.Forms;
 
 namespace EnglishWhale
 {
-    public partial class WrittenQuizForm : Form
+    public partial class WrittenQuizForm : Form, IMute
     {
-        private const int TIMER_LIMIT = 10;
+        private int timerLimit = 1;
         private Timer timer;
         private MainController mContr;
         private int timeCounter;
         private string rightAnswer;
         private Color normalBackColor;
         private Color normalForeColor;
+        public bool MuteQuestion { get; set; }
+        public bool MuteAnswer { get; set; }
         public WrittenQuizForm(MainController mContr)
         {
+            MuteQuestion = true;
+            MuteAnswer = true;
             this.mContr = mContr;
             InitializeComponent();
             GetNextWordsPair();
@@ -46,17 +51,25 @@ namespace EnglishWhale
         private void GetNextWordsPair()
         {
             KeyValuePair<string, string> pair = mContr.getRamdomWordsPair();
-            questionTextBox.Text = pair.Key;
+            string question = pair.Key;
+            questionTextBox.Text = question;
             questionTextBox.SelectAll();
             questionTextBox.SelectionAlignment = HorizontalAlignment.Center;
             questionTextBox.DeselectAll();
+            if (!MuteQuestion)
+            {
+                mContr.SpeakThis(question);
+            }
             rightAnswer = pair.Value;
         }
 
         private void StatrTimer()
         {
             timeCounter = 0;
-            timerBar.Maximum = TIMER_LIMIT;
+            timerLimit = rightAnswer.Length > 10 ? rightAnswer.Length : 10;
+            
+            timerBar.Maximum = timerLimit;
+
             timer = new Timer();
             timer.Interval = 1000;
             timer.Tick += Timer_Tick;
@@ -65,7 +78,7 @@ namespace EnglishWhale
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (timeCounter == TIMER_LIMIT)
+            if (timeCounter == timerLimit)
             {
                 WrongAnswer(answerTextBox, null);
                 return;
@@ -75,6 +88,7 @@ namespace EnglishWhale
         }
         private void WrongAnswer(object sender, EventArgs e)
         {
+            SetEnebledWithRefresh(nextButton, false);
             Control tBox = sender as Control;
             normalBackColor = tBox.BackColor;
             normalForeColor = tBox.ForeColor;
@@ -85,6 +99,7 @@ namespace EnglishWhale
 
         private void AnswerTextBoxReset_Tick(object sender, EventArgs e)
         {
+            if (this.IsDisposed) return;
             Timer tmr = sender as Timer;
             tmr.Stop();
             tmr.Dispose();
@@ -94,11 +109,13 @@ namespace EnglishWhale
             answerTextBox.TextChanged += AnswerTextBox_TextChanged;
             answerTextBox.ReadOnly = false;
             GetNextWordsPair();
-            timer.Start();
+            StatrTimer();
+            SetEnebledWithRefresh(nextButton, true);
         }
 
         private void AnswerTextBox_TextChanged(object sender, EventArgs e)
         {
+            SetEnebledWithRefresh(nextButton, false);
             string answer = answerTextBox.Text;
             bool isRightAns = mContr.isRightAnswer(rightAnswer, answer);
             if (isRightAns)
@@ -110,6 +127,10 @@ namespace EnglishWhale
                 tBox.ForeColor = Color.White;
                 Reset();
             }
+            else
+            {
+                SetEnebledWithRefresh(nextButton, true);
+            }
         }
 
         private void Reset()
@@ -120,10 +141,65 @@ namespace EnglishWhale
             timer.Stop();
             timeCounter = 0;
             timerBar.Value = timeCounter;
+            if (!MuteAnswer)
+            {
+                mContr.SpeakThis(rightAnswer);
+            }
             Timer tmr = new Timer();
             tmr.Interval = 5000;
             tmr.Tick += AnswerTextBoxReset_Tick;
             tmr.Start();
+        }
+
+        private void NextButton_Click(object sender, EventArgs e)
+        {
+            Button btn = sender as Button;
+            SetEnebledWithRefresh(btn, false);
+            string userAnswer = answerTextBox.Text;
+            if (String.IsNullOrEmpty(userAnswer))
+            {
+                answerTextBox.Text = rightAnswer.Substring(0, 1);
+                SetEnebledWithRefresh(btn, true);
+                return;
+            }
+            // If you use this for help you with the last letter then you will lose
+            if (userAnswer.StartsWith(rightAnswer.Substring(0, rightAnswer.Length - 1)))
+            {
+                WrongAnswer(answerTextBox, null);
+                return;
+            }
+            if (mContr.isRightAnswer(rightAnswer, userAnswer))
+            {
+                SetEnebledWithRefresh(btn, true);
+                return;
+            }
+
+            char[] rAnsChars = rightAnswer.ToCharArray();
+            char[] userAnsChars = userAnswer.ToCharArray();
+            char[] helpChars = new char[rAnsChars.Length];
+
+            for (int i = 0; i < rAnsChars.Length; i++)
+            {
+                helpChars[i] = rAnsChars[i];
+                if (userAnsChars.Length - 1 == i)
+                {
+                    helpChars[i+1] = rAnsChars[i+1];
+                    break;
+                }
+                if (userAnsChars[i] != rAnsChars[i])
+                {
+                    break;
+                }
+            }
+            answerTextBox.Text = new String(helpChars);
+            answerTextBox.SelectionStart = answerTextBox.Text.Length;
+            SetEnebledWithRefresh(btn, true);
+        }
+
+        private void SetEnebledWithRefresh(Button btn, bool enabled)
+        {
+            btn.Enabled = enabled;
+            btn.Refresh();
         }
     }
 }

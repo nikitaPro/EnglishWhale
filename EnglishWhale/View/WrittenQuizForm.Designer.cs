@@ -87,6 +87,7 @@
             this.nextButton.Size = new System.Drawing.Size(50, 40);
             this.nextButton.TabIndex = 4;
             this.nextButton.UseVisualStyleBackColor = true;
+            this.nextButton.Click += new System.EventHandler(this.NextButton_Click);
             this.nextButton.Paint += new System.Windows.Forms.PaintEventHandler(this.NextButton_Paint);
             // 
             // WrittenQuizForm
