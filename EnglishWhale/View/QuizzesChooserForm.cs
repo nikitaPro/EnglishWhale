@@ -46,5 +46,9 @@ namespace EnglishWhale
             
         }
 
+        private void learningButton_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

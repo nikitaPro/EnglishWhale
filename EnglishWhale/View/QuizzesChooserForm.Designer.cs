@@ -33,6 +33,7 @@
             this.chooseAnswerButton = new System.Windows.Forms.Button();
             this.writeAnswerButton = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.learningButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // diretionComboBox
@@ -45,7 +46,7 @@
             // 
             // chooseAnswerButton
             // 
-            this.chooseAnswerButton.Location = new System.Drawing.Point(12, 53);
+            this.chooseAnswerButton.Location = new System.Drawing.Point(12, 113);
             this.chooseAnswerButton.Name = "chooseAnswerButton";
             this.chooseAnswerButton.Size = new System.Drawing.Size(117, 55);
             this.chooseAnswerButton.TabIndex = 1;
@@ -55,7 +56,7 @@
             // 
             // writeAnswerButton
             // 
-            this.writeAnswerButton.Location = new System.Drawing.Point(169, 53);
+            this.writeAnswerButton.Location = new System.Drawing.Point(168, 113);
             this.writeAnswerButton.Name = "writeAnswerButton";
             this.writeAnswerButton.Size = new System.Drawing.Size(116, 55);
             this.writeAnswerButton.TabIndex = 2;
@@ -65,7 +66,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 114);
+            this.button1.Location = new System.Drawing.Point(91, 174);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(117, 55);
             this.button1.TabIndex = 3;
@@ -73,11 +74,22 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.chooseAnswerWithTimerButton_Click);
             // 
+            // learningButton
+            // 
+            this.learningButton.Location = new System.Drawing.Point(93, 53);
+            this.learningButton.Name = "learningButton";
+            this.learningButton.Size = new System.Drawing.Size(115, 54);
+            this.learningButton.TabIndex = 4;
+            this.learningButton.Text = "Learning";
+            this.learningButton.UseVisualStyleBackColor = true;
+            this.learningButton.Click += new System.EventHandler(this.learningButton_Click);
+            // 
             // QuizzesChooserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(297, 450);
+            this.ClientSize = new System.Drawing.Size(297, 255);
+            this.Controls.Add(this.learningButton);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.writeAnswerButton);
             this.Controls.Add(this.chooseAnswerButton);
@@ -96,5 +108,6 @@
         private System.Windows.Forms.Button chooseAnswerButton;
         private System.Windows.Forms.Button writeAnswerButton;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button learningButton;
     }
 }
