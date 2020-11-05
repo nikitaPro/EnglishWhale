@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LearningForm));
             this.SuspendLayout();
             // 
             // LearningForm
@@ -37,12 +37,13 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(584, 362);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "LearningForm";
             this.Text = "Learning";
-            this.makeSentencePanel.ResumeLayout(false);
-            this.makeSentencePanel.PerformLayout();
             this.ResumeLayout(false);
+
         }
+        #endregion
 
         private System.Windows.Forms.Panel GetMakeSentencePanel()
         {
@@ -58,6 +59,9 @@
                 this.makeSentencePanel.Name = "makeSentencePanel";
                 this.makeSentencePanel.Size = new System.Drawing.Size(585, 365);
                 this.makeSentencePanel.TabIndex = 0;
+
+                this.makeSentencePanel.ResumeLayout(false);
+                this.makeSentencePanel.PerformLayout();
             }
             return this.makeSentencePanel;
         }
@@ -83,6 +87,7 @@
             if (this.firstPhraseLabel == null)
             {
                 this.firstPhraseLabel = new System.Windows.Forms.Label();
+                this.firstPhraseLabel.Font = font14;
                 this.firstPhraseLabel.AutoSize = true;
                 this.firstPhraseLabel.Location = new System.Drawing.Point(43, 119);
                 this.firstPhraseLabel.Name = "firstPhraseLabel";
@@ -98,6 +103,7 @@
             if(this.secondPhraseLabel == null)
             {
                 this.secondPhraseLabel = new System.Windows.Forms.Label();
+                this.secondPhraseLabel.Font = font14;
                 this.secondPhraseLabel.AutoSize = true;
                 this.secondPhraseLabel.Location = new System.Drawing.Point(43, 176);
                 this.secondPhraseLabel.Name = "secondPhraseLabel";
@@ -114,7 +120,7 @@
             {
                 this.showWordPanel = new System.Windows.Forms.Panel();
                 this.showWordPanel.SuspendLayout();
-                ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+                ((System.ComponentModel.ISupportInitialize)(GetVoicePicture())).BeginInit();
 
                 this.showWordPanel.Controls.Add(GetVoicePicture());
                 this.showWordPanel.Controls.Add(GetAnswerLabel());
@@ -127,7 +133,7 @@
 
                 this.showWordPanel.ResumeLayout(false);
                 this.showWordPanel.PerformLayout();
-                ((System.ComponentModel.ISupportInitialize)GetShowWordPanel()).EndInit();
+                ((System.ComponentModel.ISupportInitialize)GetVoicePicture()).EndInit();
             }
             return this.showWordPanel;
         }
@@ -170,7 +176,7 @@
             {
                 this.answerLabel = new System.Windows.Forms.Label();
                 this.answerLabel.AutoSize = true;
-                this.answerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+                this.answerLabel.Font = font14;
                 this.answerLabel.Location = new System.Drawing.Point(52, 177);
                 this.answerLabel.Name = "answerLabel";
                 this.answerLabel.Size = new System.Drawing.Size(66, 24);
@@ -182,23 +188,23 @@
 
         private System.Windows.Forms.PictureBox GetVoicePicture()
         {
-            if (this.pictureBox1 == null)
+            if (this.voicePicture == null)
             {
-                this.pictureBox1 = new System.Windows.Forms.PictureBox();
-                this.pictureBox1.Image = global::EnglishWhale.Properties.Resources.volume;
-                this.pictureBox1.Location = new System.Drawing.Point(56, 12);
-                this.pictureBox1.Name = "pictureBox1";
-                this.pictureBox1.Size = new System.Drawing.Size(37, 35);
-                this.pictureBox1.TabIndex = 2;
-                this.pictureBox1.TabStop = false;
+                this.voicePicture = new System.Windows.Forms.PictureBox();
+                this.voicePicture.Image = global::EnglishWhale.Properties.Resources.volume;
+                this.voicePicture.Location = new System.Drawing.Point(56, 12);
+                this.voicePicture.Name = "pictureBox1";
+                this.voicePicture.Size = new System.Drawing.Size(37, 35);
+                this.voicePicture.TabIndex = 2;
+                this.voicePicture.TabStop = false;
             }
-            return this.pictureBox1;
+            return this.voicePicture;
         }
 
-        #endregion
-
+        
+        private System.Drawing.Font font14 = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
         private System.Windows.Forms.Panel showWordPanel;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox voicePicture;
         private System.Windows.Forms.Label answerLabel;
         private System.Windows.Forms.Label questionLabel;
         private System.Windows.Forms.Button nextButton;

@@ -1,5 +1,4 @@
-﻿
-using EnglishWhale.Models;
+﻿using EnglishWhale.Models;
 using EnglishWhale.Services;
 using EnglishWhale.Services.DownloadService;
 using EnglishWhale.Services.DownloadService.Implementation;
@@ -18,6 +17,8 @@ namespace EnglishWhale.Controller
 {
     public class MainController
     {
+        //must be even
+        private const int LEARNING_WORD_PAIRS_NUMBER = 4;
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private string tempPathForAudio;
         private LanguageDictionary currentDictionary;
@@ -29,7 +30,7 @@ namespace EnglishWhale.Controller
         {
             tempPathForAudio = Path.Combine(Path.GetTempPath(), @"audio");
             downloader = new DownloaderBufferedProxy();
-            rnd = new Random();
+            rnd = new Random((int)DateTime.Now.ToBinary());
         }
 
         public string ChooseCSVFile()
@@ -64,6 +65,15 @@ namespace EnglishWhale.Controller
             }
         }
 
+        public void StartLearning(LanguageDictionary languageDictionary, Form parentForm)
+        {
+            currentDictionary = languageDictionary;
+            LearningForm lForm = new LearningForm(this);
+            lForm.FormClosing += delegate { parentForm.Visible = true; };
+            parentForm.Visible = false;
+            lForm.Show();
+        }
+
         public void StartWrittenQuiz(LanguageDictionary languageDictionary, Form parentForm)
         {
             parentForm.Visible = false;
@@ -80,7 +90,7 @@ namespace EnglishWhale.Controller
             form.MuteQuestion = currentDictionary.IsEnglishTo;
         }
 
-        public KeyValuePair<string, string> getRamdomWordsPair()
+        public KeyValuePair<string, string> GetRamdomWordsPair()
         {
             int testPairNumber = rnd.Next(0, currentDictionary.Dict.Count);
             return currentDictionary.Dict.ElementAt(testPairNumber);
@@ -203,5 +213,19 @@ namespace EnglishWhale.Controller
             wplayer.close();
         }
 
+        public LearningService GetLearningService()
+        {
+            HashSet<KeyValuePair<string, string>> learningSet = new HashSet<KeyValuePair<string, string>>(LEARNING_WORD_PAIRS_NUMBER);
+            for (int i = 0; i < LEARNING_WORD_PAIRS_NUMBER; i++)
+            {
+                KeyValuePair<string, string> pair;
+                do
+                {
+                    pair = GetRamdomWordsPair();
+                }
+                while (!learningSet.Add(pair));
+            }
+            return new LearningService(learningSet.ToList());
+        }
     }
 }

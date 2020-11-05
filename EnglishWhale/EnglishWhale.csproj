@@ -67,8 +67,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller\MainController.cs" />
-    <Compile Include="Models\LearningSet.cs" />
     <Compile Include="Models\QuizWithAnswers.cs" />
+    <Compile Include="Services\LearningService.cs" />
     <Compile Include="View\IMute.cs" />
     <Compile Include="View\LearningForm.cs">
       <SubType>Form</SubType>
@@ -108,6 +108,12 @@
     <Compile Include="View\WrittenQuizForm.Designer.cs">
       <DependentUpon>WrittenQuizForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\WrittenQuizPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="View\WrittenQuizPanel.Designer.cs">
+      <DependentUpon>WrittenQuizPanel.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="View\LearningForm.resx">
       <DependentUpon>LearningForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -135,6 +141,9 @@
     </Content>
     <EmbeddedResource Include="View\WrittenQuizForm.resx">
       <DependentUpon>WrittenQuizForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\WrittenQuizPanel.resx">
+      <DependentUpon>WrittenQuizPanel.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
