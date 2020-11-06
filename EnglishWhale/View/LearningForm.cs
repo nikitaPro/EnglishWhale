@@ -1,24 +1,23 @@
 ﻿using EnglishWhale.Controller;
+using EnglishWhale.Models;
 using EnglishWhale.Services;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace EnglishWhale.View
 {
-    public partial class LearningForm : Form
+    public partial class LearningForm : Form, IMute
     {
         private MainController mContr;
         private LearningService learningService;
+
+        public bool MuteQuestion { get ; set; }
+        public bool MuteAnswer { get ; set; }
+
         public LearningForm(MainController mContr)
         {
             this.mContr = mContr;
+            mContr.SetMutes(this);
             InitializeComponent();
             StartLearning();
         }
@@ -35,9 +34,13 @@ namespace EnglishWhale.View
         {
             if (!learningService.RoundFinish)
             {
-                KeyValuePair<string, string> pair = learningService.GetNextWord();
-                GetQuestioLabel().Text = pair.Key;
-                GetAnswerLabel().Text = pair.Value;
+                WordsPair pair = learningService.GetNextWord();
+                GetQuestioLabel().Text = pair.Translation;
+                GetAnswerLabel().Text = pair.Original;
+                if (!MuteAnswer)
+                {
+                    mContr.SpeakThis(pair.Translation);
+                }
                 return;
             }
             else
@@ -51,16 +54,44 @@ namespace EnglishWhale.View
         {
             if (!learningService.RoundFinish)
             {
-                KeyValuePair<string, string> pair1 = learningService.GetNextWord();
-                KeyValuePair<string, string> pair2 = learningService.GetNextWord();
-                GetFirstPhraseLabel().Text = pair1.Key;
-                GetSecondPhraseLabel().Text = pair2.Key;
+                WordsPair pair1 = learningService.GetNextWord();
+                WordsPair pair2 = learningService.GetNextWord();
+                GetFirstPhraseLabel().Text = pair1.Translation;
+                GetSecondPhraseLabel().Text = pair2.Translation;
+                if (!MuteAnswer)
+                {
+                    mContr.SpeakThis(pair1.Translation);
+                    mContr.SpeakThis(pair2.Translation);
+                }
             }
             else
             {
-                Close();
-                Dispose();
+                StartWrittenPart();
+                
             }
+        }
+
+        private void StartWrittenPart()
+        {
+            WrittenQuizPanel writtenQuizPanel = new WrittenQuizPanel(mContr,
+                delegate (MainController mController)
+                {
+                    if (learningService.RoundFinish)
+                    {
+                        this.Close();
+                        this.Dispose();
+                        return null;
+                    }
+                    else
+                    {
+                        return learningService.GetNextWord();
+                    }
+                });
+            this.Controls.Remove(GetMakeSentencePanel());
+            ReloadForm();
+            this.Controls.Add(writtenQuizPanel);
+            writtenQuizPanel.MuteAnswer = MuteAnswer;
+            writtenQuizPanel.MuteQuestion = MuteQuestion;
         }
 
         private void StartMakeSentencePart()
@@ -69,6 +100,18 @@ namespace EnglishWhale.View
             ReloadForm();
             this.Controls.Add(GetMakeSentencePanel());
             GetNextButton().Click += NextPairsForSentenceButton_Click;
+        }
+
+        private void VoicePicture_MouseEnter(object sender, System.EventArgs e)
+        {
+            string text = GetQuestioLabel().Text;
+            mContr.SpeakThis(text);
+        }
+
+        private void PhraseLabel_MouseEnter(object sender, System.EventArgs e)
+        {
+            string text = ((Label)sender).Text;
+            mContr.SpeakThis(text);
         }
 
         private void ReloadForm()

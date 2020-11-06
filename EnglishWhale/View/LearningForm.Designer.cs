@@ -94,9 +94,11 @@
                 this.firstPhraseLabel.Size = new System.Drawing.Size(35, 13);
                 this.firstPhraseLabel.TabIndex = 2;
                 this.firstPhraseLabel.Text = "label2";
+                this.firstPhraseLabel.MouseEnter += PhraseLabel_MouseEnter;
             }
             return this.firstPhraseLabel;
         }
+
 
         private System.Windows.Forms.Label GetSecondPhraseLabel()
         {
@@ -110,6 +112,7 @@
                 this.secondPhraseLabel.Size = new System.Drawing.Size(35, 13);
                 this.secondPhraseLabel.TabIndex = 3;
                 this.secondPhraseLabel.Text = "label3";
+                this.secondPhraseLabel.MouseEnter += PhraseLabel_MouseEnter;
             }
             return this.secondPhraseLabel;
         }
@@ -197,11 +200,11 @@
                 this.voicePicture.Size = new System.Drawing.Size(37, 35);
                 this.voicePicture.TabIndex = 2;
                 this.voicePicture.TabStop = false;
+                this.voicePicture.MouseEnter += VoicePicture_MouseEnter;
             }
             return this.voicePicture;
         }
 
-        
         private System.Drawing.Font font14 = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
         private System.Windows.Forms.Panel showWordPanel;
         private System.Windows.Forms.PictureBox voicePicture;

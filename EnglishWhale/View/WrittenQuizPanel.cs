@@ -8,11 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using EnglishWhale.Controller;
+using EnglishWhale.Models;
 
 namespace EnglishWhale.View
 {
     public partial class WrittenQuizPanel : Panel
     {
+        public delegate WordsPair GetWordPairMethod(MainController mController);
         private int timerLimit = 1;
         private Timer timer;
         private MainController mContr;
@@ -20,10 +22,12 @@ namespace EnglishWhale.View
         private string rightAnswer;
         private Color normalBackColor;
         private Color normalForeColor;
+        private GetWordPairMethod GetWordPairVisit;
         public bool MuteQuestion { get; set; }
         public bool MuteAnswer { get; set; }
-        public WrittenQuizPanel(MainController mContr)
+        public WrittenQuizPanel(MainController mContr, GetWordPairMethod dataSourceVisit)
         {
+            this.GetWordPairVisit = dataSourceVisit;
             MuteQuestion = true;
             MuteAnswer = true;
             this.mContr = mContr;
@@ -49,8 +53,13 @@ namespace EnglishWhale.View
 
         private void GetNextWordsPair()
         {
-            KeyValuePair<string, string> pair = mContr.GetRamdomWordsPair();
-            string question = pair.Key;
+            WordsPair pair = GetWordPairVisit(mContr);
+            if (pair == null)
+            {
+                timer.Stop();
+                return;
+            }
+            string question = pair.Original;
             questionTextBox.Text = question;
             questionTextBox.SelectAll();
             questionTextBox.SelectionAlignment = HorizontalAlignment.Center;
@@ -59,7 +68,7 @@ namespace EnglishWhale.View
             {
                 mContr.SpeakThis(question);
             }
-            rightAnswer = pair.Value;
+            rightAnswer = pair.Translation;
         }
 
         private void StatrTimer()

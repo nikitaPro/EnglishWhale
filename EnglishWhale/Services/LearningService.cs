@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EnglishWhale.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,8 @@ namespace EnglishWhale.Services
 {
     public class LearningService
     {
-        private List<KeyValuePair<string, string>> words;
-        private List<KeyValuePair<string, string>> tempWords;
+        private List<WordsPair> words;
+        private List<WordsPair> tempWords;
         private Random rnd;
         private bool round;
         public bool RoundFinish 
@@ -25,7 +26,7 @@ namespace EnglishWhale.Services
             }
         } 
 
-        public LearningService(List<KeyValuePair<string, string>> someWords)
+        public LearningService(List<WordsPair> someWords)
         {
             this.words = someWords;
             CreateNewTempWordsBuffer();
@@ -33,9 +34,9 @@ namespace EnglishWhale.Services
             round = false;
         }
 
-        public KeyValuePair<string, string> GetNextWord()
+        public WordsPair GetNextWord()
         {
-            KeyValuePair<string, string> pair = MovePairFromOneBuffeToOther(words, tempWords);
+            WordsPair pair = MovePairFromOneBuffeToOther(words, tempWords);
             if (words.Count == 0)
             {
                 Reload();
@@ -50,9 +51,9 @@ namespace EnglishWhale.Services
             CreateNewTempWordsBuffer();
         }
 
-        private KeyValuePair<string, string> MovePairFromOneBuffeToOther(List<KeyValuePair<string, string>> bufSrc, List<KeyValuePair<string, string>> bufDest)
+        private WordsPair MovePairFromOneBuffeToOther(List<WordsPair> bufSrc, List<WordsPair> bufDest)
         {
-            KeyValuePair<string, string> pair = bufSrc.ElementAt(rnd.Next(bufSrc.Count));
+            WordsPair pair = bufSrc.ElementAt(rnd.Next(bufSrc.Count));
             bufSrc.Remove(pair);
             bufDest.Add(pair);
             return pair;
@@ -60,7 +61,7 @@ namespace EnglishWhale.Services
 
         private void CreateNewTempWordsBuffer()
         {
-            tempWords = new List<KeyValuePair<string, string>>();
+            tempWords = new List<WordsPair>();
         }
 
     }

@@ -36,6 +36,8 @@
             this.Location = new System.Drawing.Point(0, 0);
             this.Name = "showWordPanel";
             this.Size = new System.Drawing.Size(585, 365);
+            this.BackgroundImage = global::EnglishWhale.Properties.Resources.background_1;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.TabIndex = 0;
 
             this.ResumeLayout(false);
@@ -95,7 +97,7 @@
             if (this.questionTextBox == null)
             {
                 this.questionTextBox = new System.Windows.Forms.RichTextBox();
-                this.questionTextBox.BackColor = System.Drawing.Color.BlanchedAlmond;
+                this.questionTextBox.BackColor = System.Drawing.Color.Goldenrod;
                 this.questionTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                 this.questionTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
                 this.questionTextBox.Location = new System.Drawing.Point(65, 29);
@@ -113,7 +115,7 @@
             if (this.answerTextBox == null)
             {
                 this.answerTextBox = new System.Windows.Forms.TextBox();
-                this.answerTextBox.BackColor = System.Drawing.Color.BlanchedAlmond;
+                this.answerTextBox.BackColor = System.Drawing.Color.Goldenrod;
                 this.answerTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                 this.answerTextBox.Font = font;
                 this.answerTextBox.ForeColor = System.Drawing.SystemColors.WindowText;

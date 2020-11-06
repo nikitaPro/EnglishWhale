@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Controller\MainController.cs" />
     <Compile Include="Models\QuizWithAnswers.cs" />
+    <Compile Include="Models\WordsPair.cs" />
     <Compile Include="Services\LearningService.cs" />
     <Compile Include="View\IMute.cs" />
     <Compile Include="View\LearningForm.cs">
@@ -136,6 +137,10 @@
     <EmbeddedResource Include="View\ChooseAnswerQuizForm.resx">
       <DependentUpon>ChooseAnswerQuizForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="images\button_back.png" />
+    <None Include="images\button_back_mouse_clicked.png" />
+    <None Include="images\button_back_mouse_enter.png" />
+    <None Include="images\background_1.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

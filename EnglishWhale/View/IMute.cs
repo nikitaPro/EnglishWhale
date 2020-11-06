@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EnglishWhale.View
 {
-    interface IMute
+    public interface IMute
     {
         bool MuteQuestion { get; set; }
         bool MuteAnswer { get; set; }

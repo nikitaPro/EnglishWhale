@@ -1,4 +1,5 @@
-﻿using EnglishWhale.View;
+﻿using EnglishWhale.Controller;
+using EnglishWhale.View;
 
 namespace EnglishWhale
 {
@@ -31,10 +32,14 @@ namespace EnglishWhale
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WrittenQuizForm));
-            writtenQuizPanel = new WrittenQuizPanel(mContr);
+
+            writtenQuizPanel = new WrittenQuizPanel(mContr, 
+                delegate (MainController mController) 
+                { 
+                    return mController.GetRamdomWordsPair(); 
+                });
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.MediumSeaGreen;
             this.ClientSize = new System.Drawing.Size(484, 312);
             this.Controls.Add(this.writtenQuizPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;

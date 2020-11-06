@@ -84,16 +84,17 @@ namespace EnglishWhale.Controller
             form.Show();
         }
 
-        private void SetMutes(IMute form)
+        public void SetMutes(IMute form)
         {
             form.MuteAnswer = currentDictionary.IsEnglishFrom;
             form.MuteQuestion = currentDictionary.IsEnglishTo;
         }
 
-        public KeyValuePair<string, string> GetRamdomWordsPair()
+        public WordsPair GetRamdomWordsPair()
         {
             int testPairNumber = rnd.Next(0, currentDictionary.Dict.Count);
-            return currentDictionary.Dict.ElementAt(testPairNumber);
+            KeyValuePair<string, string> pair = currentDictionary.Dict.ElementAt(testPairNumber);
+            return new WordsPair(pair.Key, pair.Value);
         }
 
         public void StartChooseAnswerQuiz(LanguageDictionary languageDictionary, bool timer, Form parentForm)
@@ -215,10 +216,10 @@ namespace EnglishWhale.Controller
 
         public LearningService GetLearningService()
         {
-            HashSet<KeyValuePair<string, string>> learningSet = new HashSet<KeyValuePair<string, string>>(LEARNING_WORD_PAIRS_NUMBER);
+            HashSet<WordsPair> learningSet = new HashSet<WordsPair>(LEARNING_WORD_PAIRS_NUMBER);
             for (int i = 0; i < LEARNING_WORD_PAIRS_NUMBER; i++)
             {
-                KeyValuePair<string, string> pair;
+                WordsPair pair;
                 do
                 {
                     pair = GetRamdomWordsPair();
