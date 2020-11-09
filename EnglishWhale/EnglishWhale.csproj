@@ -70,6 +70,9 @@
     <Compile Include="Models\QuizWithAnswers.cs" />
     <Compile Include="Models\WordsPair.cs" />
     <Compile Include="Services\LearningService.cs" />
+    <Compile Include="View\CustomButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="View\IMute.cs" />
     <Compile Include="View\LearningForm.cs">
       <SubType>Form</SubType>
@@ -115,6 +118,7 @@
     <Compile Include="View\WrittenQuizPanel.Designer.cs">
       <DependentUpon>WrittenQuizPanel.cs</DependentUpon>
     </Compile>
+    <None Include="Resources\button_back_good.bmp" />
     <EmbeddedResource Include="View\LearningForm.resx">
       <DependentUpon>LearningForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -141,6 +145,9 @@
     <None Include="images\button_back_mouse_clicked.png" />
     <None Include="images\button_back_mouse_enter.png" />
     <None Include="images\background_1.png" />
+    <None Include="images\button_back_bad.png" />
+    <None Include="images\button_back_good.png" />
+    <None Include="images\background_2.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

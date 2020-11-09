@@ -6,12 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EnglishWhale.Models;
+using System.IO;
 
 namespace EnglishWhale.Services
 {
     public class CsvReader
     {
         public List<LanguageDictionary> Vocabularies { get; }
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private string path;
         public CsvReader(string path)
         {
@@ -22,6 +24,7 @@ namespace EnglishWhale.Services
 
         private void readCsv()
         {
+            checkEmptyFields();
             using (TextFieldParser csvParser = new TextFieldParser(path))
             {
                 LanguageDictionary directTranslation;
@@ -33,11 +36,35 @@ namespace EnglishWhale.Services
                 csvParser.TrimWhiteSpace = true;
                 // read first row
                 string[] fields = csvParser.ReadFields();
-                // initiate dictionary with first row
+                
                 EnglishDetector enDetector = new EnglishDetector(); // Detector for determining where English is.
-                directTranslation = new LanguageDictionary(fields[0], fields[1], enDetector);
+                LanguageDictionary.EnglishIs englishIs ;
+                string from = fields[0];
+                string to = fields[1];
+                try
+                {
+                    englishIs = enDetector.isTheDirectionEnglish(to)
+                        ? LanguageDictionary.EnglishIs.TO
+                        : (enDetector.isTheDirectionEnglish(from) 
+                        ? LanguageDictionary.EnglishIs.FROM 
+                        : LanguageDictionary.EnglishIs.NEITHER);
+                }
+                catch (System.Exception)
+                {
+                    englishIs = LanguageDictionary.EnglishIs.NEITHER;
+                    Logger.Error("Fail when detector trying to determine english language.");
+                    throw new IOException("No internet connection.");
+                }
+                if (englishIs.Equals(LanguageDictionary.EnglishIs.NEITHER))
+                {
+                    throw new IOException("No english at first row.");
+                }
+
+                // initiate dictionary with first row
+                directTranslation = new LanguageDictionary(fields[0], fields[1], englishIs);
                 directTranslation.Dict.Add(fields[2], fields[3]);
-                reversTranslation = new LanguageDictionary(fields[1], fields[0], enDetector);
+                reversTranslation = new LanguageDictionary(fields[1], fields[0], 
+                    englishIs.Equals(LanguageDictionary.EnglishIs.TO) ? LanguageDictionary.EnglishIs.FROM : LanguageDictionary.EnglishIs.TO);
                 reversTranslation.Dict.Add(fields[3], fields[2]);
                 // let's process other rows
                 while (!csvParser.EndOfData)
@@ -74,7 +101,7 @@ namespace EnglishWhale.Services
                     }
                     else
                     {
-                        Console.WriteLine("Too many languages in the file. Skipping this row.");
+                        Logger.Info("Too many languages. Skipping this row: {0}, {1}, {2}, {3}", fields[0], fields[1], fields[2], fields[3]);
                     }
                    
                 }
@@ -82,14 +109,30 @@ namespace EnglishWhale.Services
                 Vocabularies.Add(reversTranslation);
                 // TODO: Delete below
                 Console.WriteLine($"{directTranslation.From} -> {directTranslation.To} {directTranslation.Dict.Count}");
-                foreach (KeyValuePair<string, string> pair in directTranslation.Dict) 
-                {
-                    Console.WriteLine($"{pair.Key} -> {pair.Value}");
-                }
                 Console.WriteLine($"{reversTranslation.From} -> {reversTranslation.To} {reversTranslation.Dict.Count}");
-                foreach (KeyValuePair<string, string> pair in reversTranslation.Dict)
+            }
+        }
+
+        private void checkEmptyFields()
+        {
+            using (TextFieldParser csvParser = new TextFieldParser(path))
+            {
+                // set up parser
+                csvParser.CommentTokens = new string[] { "#" };
+                csvParser.SetDelimiters(new string[] { "," });
+                csvParser.HasFieldsEnclosedInQuotes = true;
+                csvParser.TrimWhiteSpace = true;
+                // read first row
+                while (!csvParser.EndOfData)
                 {
-                    Console.WriteLine($"{pair.Key} -> {pair.Value}");
+                    string[] fields = csvParser.ReadFields();
+                    foreach (string cell in fields)
+                    {
+                        if (String.IsNullOrWhiteSpace(cell))
+                        {
+                            throw new IOException("File contains empty cells.");
+                        }
+                    }
                 }
             }
         }

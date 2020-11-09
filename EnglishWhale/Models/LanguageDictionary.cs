@@ -5,35 +5,26 @@ namespace EnglishWhale.Models
 {
     public class LanguageDictionary
     {
+        public enum EnglishIs
+        {
+            FROM,
+            TO,
+            NEITHER
+        }
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public string From { get; }
         public string To { get; }
         public Dictionary<string, string> Dict { get; }
-        private string english;
-        public bool IsEnglishTo { get { return "to".Equals(english); } }
-        public bool IsEnglishFrom { get { return "from".Equals(english); } }
+        private EnglishIs english;
+        public bool IsEnglishTo { get { return english.Equals(EnglishIs.TO); } }
+        public bool IsEnglishFrom { get { return english.Equals(EnglishIs.FROM); } }
 
-        public LanguageDictionary(string from, string to, EnglishDetector detector)
+        public LanguageDictionary(string from, string to, EnglishIs fromOrTo)
         {
             From = from;
             To = to;
+            english = fromOrTo;
             Dict = new Dictionary<string, string>();
-            whereIsEnglish(detector);
-        }
-
-        private void whereIsEnglish(EnglishDetector detector)
-        {
-            try
-            {
-                english = detector.isTheDirectionEnglish(To)
-                    ? "to"
-                    : (detector.isTheDirectionEnglish(From) ? "from" : null);
-            }
-            catch (System.Exception)
-            {
-                english = null;
-                Logger.Error("Fail when detector trying to determine english language.");
-            }
         }
 
         public string this[string s]

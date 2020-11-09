@@ -1,6 +1,8 @@
-﻿using System.Runtime.Remoting.Messaging;
+﻿using EnglishWhale.View;
+using System.Drawing;
+using System.Runtime.Remoting.Messaging;
 
-namespace EnglishWhale
+namespace EnglishWhale.View
 {
     partial class ChooseAnswerQuizForm
     {
@@ -43,6 +45,8 @@ namespace EnglishWhale
             // questionTextBox
             // 
             this.questionTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.questionTextBox.BackColor = System.Drawing.Color.Goldenrod;
+            this.questionTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.questionTextBox.Location = new System.Drawing.Point(12, 46);
             this.questionTextBox.Name = "questionTextBox";
             this.questionTextBox.ReadOnly = true;
@@ -53,13 +57,13 @@ namespace EnglishWhale
             // pictureBox1
             // 
             this.pictureBox1.Image = global::EnglishWhale.Properties.Resources.volume;
-            this.pictureBox1.InitialImage = null;
             this.pictureBox1.Location = new System.Drawing.Point(12, 10);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(30, 30);
+            this.pictureBox1.Size = new System.Drawing.Size(32, 32);
             this.pictureBox1.TabIndex = 6;
             this.pictureBox1.TabStop = false;
             this.pictureBox1.MouseEnter += new System.EventHandler(this.VolumePic_MouseEnter);
+            this.pictureBox1.BackColor = Color.FromArgb(0);
             // 
             // timerBar
             // 
@@ -71,7 +75,9 @@ namespace EnglishWhale
             // timerLabel
             // 
             this.timerLabel.AutoSize = true;
-            this.timerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.timerLabel.ForeColor = System.Drawing.Color.White;
+            this.timerLabel.BackColor = System.Drawing.Color.FromArgb(0);
+            this.timerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.timerLabel.Location = new System.Drawing.Point(264, 195);
             this.timerLabel.Name = "timerLabel";
             this.timerLabel.Size = new System.Drawing.Size(48, 20);
@@ -93,20 +99,23 @@ namespace EnglishWhale
             this.Controls.Add(GetButton2());
             this.Controls.Add(GetButton1());
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.BackgroundImage = global::EnglishWhale.Properties.Resources.background_1;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ChooseAnswerQuizForm";
             this.Text = "Choose Answer Quiz";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.MaximizeBox = false;
+            this.CenterToScreen();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         private System.Windows.Forms.Button GetButton4()
         {
             if (this.button4 == null)
             {
-                this.button4 = new System.Windows.Forms.Button();
+                this.button4 = new CustomButton();
                 this.button4.Font = font;
                 this.button4.Location = new System.Drawing.Point(372, 554);
                 this.button4.Name = "button4";
@@ -122,7 +131,7 @@ namespace EnglishWhale
         {
             if (this.button3 == null)
             {
-                this.button3 = new System.Windows.Forms.Button();
+                this.button3 = new CustomButton();
                 this.button3.Font = font;
                 this.button3.Location = new System.Drawing.Point(12, 554);
                 this.button3.Name = "button3";
@@ -138,7 +147,7 @@ namespace EnglishWhale
         {
             if (this.button2 == null)
             {
-                this.button2 = new System.Windows.Forms.Button();
+                this.button2 = new CustomButton();
                 this.button2.Font = font;
                 this.button2.Location = new System.Drawing.Point(372, 347);
                 this.button2.Name = "button2";
@@ -154,7 +163,7 @@ namespace EnglishWhale
         {
             if (this.button1 == null)
             {
-                this.button1 = new System.Windows.Forms.Button();
+                this.button1 = new CustomButton();
                 this.button1.Font = font;
                 this.button1.Location = new System.Drawing.Point(12, 347);
                 this.button1.Name = "button1";

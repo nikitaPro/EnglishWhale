@@ -1,18 +1,19 @@
 ﻿using EnglishWhale.Controller;
 using EnglishWhale.Models;
-using EnglishWhale.View;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace EnglishWhale
+namespace EnglishWhale.View
 {
     public partial class ChooseAnswerQuizForm : Form, IMute
     {
         private const int SECONDS = 10;
         private int timeCounter;
+        private bool btnDisabled;
+        private bool isTimerEnable;
 
         private MainController mContr;
         private Button rightAnswerBtn;
@@ -23,8 +24,8 @@ namespace EnglishWhale
         {
             InitializeComponent();
             this.mContr = mContr;
-            MuteQuestion = true;
-            MuteAnswer = true;
+            mContr.SetMutes(this);
+            isTimerEnable = timer;
             SetTimer(timer);
             this.FormClosing += ChooseAnswerQuizForm_FormClosing;
             GetQuestionAndAnswers();
@@ -117,12 +118,21 @@ namespace EnglishWhale
 
         private void WrongAnswer(object sender, EventArgs e)
         {
+            if (btnDisabled) return;
             StopAnswerTimer();
             MakeAllButtonsDisabled();
 
-            Control wrongAnswerBtn = sender as Control;
-            wrongAnswerBtn.BackColor = Color.Red;
-            rightAnswerBtn.BackColor = Color.Green;
+            if (sender is Button)
+            {
+                Button wrongBtn = sender as Button;
+                wrongBtn.MouseUp += delegate { wrongBtn.Image = Properties.Resources.button_back_bad; };
+                wrongBtn.MouseLeave += delegate { wrongBtn.Image = Properties.Resources.button_back_bad; };
+            }
+            else
+            {
+                (sender as Form).BackgroundImage = Properties.Resources.background_2;
+            }
+            rightAnswerBtn.Image = Properties.Resources.button_back_good;
             Timer tm = new Timer();
             tm.Interval = 2000;
             tm.Tick += delegate {
@@ -139,13 +149,16 @@ namespace EnglishWhale
 
         private void RightAnswer(object sender, EventArgs e)
         {
+            if (btnDisabled) return;
             StopAnswerTimer();
             MakeAllButtonsDisabled();
 
             Button rightAnswerBtn = sender as Button;
-            rightAnswerBtn.BackColor = Color.Green;
+            rightAnswerBtn.MouseUp += delegate { rightAnswerBtn.Image = Properties.Resources.button_back_good; };
+            rightAnswerBtn.MouseLeave += delegate { rightAnswerBtn.Image = Properties.Resources.button_back_good; };
+
             Timer tm = new Timer();
-            tm.Interval = 1000;
+            tm.Interval = 1500;
             tm.Tick += delegate {
                 tm.Stop();
                 ResetForm();
@@ -175,11 +188,12 @@ namespace EnglishWhale
 
         private void MakeAllButtonsDisabled()
         {
-            button1.Enabled = false;
-            button2.Enabled = false;
-            button3.Enabled = false;
-            button4.Enabled = false;
-        } 
+            btnDisabled = true;
+        }
+        private void MakeAllButtonsEnabled()
+        {
+            btnDisabled = false;
+        }
         private void ResetButtons()
         {
             this.Controls.Remove(GetButton4());
@@ -202,6 +216,9 @@ namespace EnglishWhale
         {
             ResetButtons();
             GetQuestionAndAnswers();
+            MakeAllButtonsEnabled();
+            SetTimer(isTimerEnable);
+            this.BackgroundImage = Properties.Resources.background_1;
         }
 
         private void GetQuestionAndAnswers()

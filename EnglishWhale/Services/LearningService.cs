@@ -24,7 +24,22 @@ namespace EnglishWhale.Services
                 }
                 return round;
             }
-        } 
+        }
+        public bool LeriningFinish
+        {
+            get
+            {
+                if (tempWords.Count != 0) return false;
+                foreach (WordsPair pair in words)
+                {
+                    if(!pair.Learned)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
 
         public LearningService(List<WordsPair> someWords)
         {

@@ -2,6 +2,7 @@
 using EnglishWhale.Models;
 using EnglishWhale.Services;
 using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace EnglishWhale.View
@@ -17,7 +18,7 @@ namespace EnglishWhale.View
         public LearningForm(MainController mContr)
         {
             this.mContr = mContr;
-            mContr.SetMutes(this);
+            mContr.SetMutesForLearningOnly(this);
             InitializeComponent();
             StartLearning();
         }
@@ -36,8 +37,10 @@ namespace EnglishWhale.View
             {
                 WordsPair pair = learningService.GetNextWord();
                 GetQuestioLabel().Text = pair.Translation;
+                TextHorizontalAlignmentCenter(GetQuestioLabel());
                 GetAnswerLabel().Text = pair.Original;
-                if (!MuteAnswer)
+                TextHorizontalAlignmentCenter(GetAnswerLabel());
+                if (!MuteQuestion)
                 {
                     mContr.SpeakThis(pair.Translation);
                 }
@@ -58,16 +61,12 @@ namespace EnglishWhale.View
                 WordsPair pair2 = learningService.GetNextWord();
                 GetFirstPhraseLabel().Text = pair1.Translation;
                 GetSecondPhraseLabel().Text = pair2.Translation;
-                if (!MuteAnswer)
-                {
-                    mContr.SpeakThis(pair1.Translation);
-                    mContr.SpeakThis(pair2.Translation);
-                }
+                GetToolTip().SetToolTip(GetFirstPhraseLabel(), pair1.Original);
+                GetToolTip().SetToolTip(GetSecondPhraseLabel(), pair2.Original);
             }
             else
             {
                 StartWrittenPart();
-                
             }
         }
 
@@ -78,20 +77,21 @@ namespace EnglishWhale.View
                 {
                     if (learningService.RoundFinish)
                     {
-                        this.Close();
-                        this.Dispose();
-                        return null;
+                        if (learningService.LeriningFinish)
+                        {
+                            this.Close();
+                            this.Dispose();
+                            return null;
+                        }
+
                     }
-                    else
-                    {
-                        return learningService.GetNextWord();
-                    }
+                    return learningService.GetNextWord();
                 });
             this.Controls.Remove(GetMakeSentencePanel());
             ReloadForm();
             this.Controls.Add(writtenQuizPanel);
-            writtenQuizPanel.MuteAnswer = MuteAnswer;
-            writtenQuizPanel.MuteQuestion = MuteQuestion;
+            writtenQuizPanel.MuteAnswer = !MuteAnswer;
+            writtenQuizPanel.MuteQuestion = !MuteQuestion;
         }
 
         private void StartMakeSentencePart()
@@ -102,16 +102,37 @@ namespace EnglishWhale.View
             GetNextButton().Click += NextPairsForSentenceButton_Click;
         }
 
-        private void VoicePicture_MouseEnter(object sender, System.EventArgs e)
+        private void VoicePicture_MouseEnter(object sender, EventArgs e)
         {
             string text = GetQuestioLabel().Text;
-            mContr.SpeakThis(text);
+            if (!MuteQuestion)
+            {
+                mContr.SpeakThis(text);
+            }
         }
 
-        private void PhraseLabel_MouseEnter(object sender, System.EventArgs e)
+        private void FirstVoicePic_MouseEnter(object sender, EventArgs e)
         {
-            string text = ((Label)sender).Text;
-            mContr.SpeakThis(text);
+            string text = GetFirstPhraseLabel().Text;
+            if (!MuteQuestion)
+            {
+                mContr.SpeakThis(text);
+            }
+        }
+        private void SecondVoicePic_MouseEnter(object sender, EventArgs e)
+        {
+            string text = GetSecondPhraseLabel().Text;
+            if (!MuteQuestion)
+            {
+                mContr.SpeakThis(text);
+            }
+        }
+
+        private void TextHorizontalAlignmentCenter(RichTextBox textBox)
+        {
+            textBox.SelectAll();
+            textBox.SelectionAlignment = HorizontalAlignment.Center;
+            textBox.DeselectAll();
         }
 
         private void ReloadForm()

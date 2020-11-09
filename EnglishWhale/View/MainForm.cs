@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using EnglishWhale.Controller;
 
-namespace EnglishWhale
+namespace EnglishWhale.View
 {
     public partial class MainForm : Form
     {
@@ -28,5 +28,6 @@ namespace EnglishWhale
             string path = filePathTextBox.Text;
             mContr.OpenQuizzesChooser(path, this);
         }
+
     }
 }

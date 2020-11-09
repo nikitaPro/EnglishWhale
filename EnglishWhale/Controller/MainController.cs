@@ -25,6 +25,7 @@ namespace EnglishWhale.Controller
         private WindowsMediaPlayer wplayer;
         private bool isTimerNeeded;
         private Random rnd;
+        private List<LanguageDictionary> vocabularies;
         IDownloader downloader;
         public MainController()
         {
@@ -52,8 +53,18 @@ namespace EnglishWhale.Controller
             CsvReader csvReader;
             if (File.Exists(path))
             {
-                csvReader = new CsvReader(path);
+                try
+                {
+                    csvReader = new CsvReader(path);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Can not open 'Quizzes Chooser'.");
+                    MessageBox.Show(mForm, ex.Message + " Please fix the issue and try again.", "File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
                 QuizzesChooserForm qcForm = new QuizzesChooserForm(this);
+                vocabularies = csvReader.Vocabularies;
                 qcForm.Add(csvReader.Vocabularies);
                 qcForm.FormClosed += delegate { mForm.Visible = true; };
                 mForm.Visible = false;
@@ -67,7 +78,14 @@ namespace EnglishWhale.Controller
 
         public void StartLearning(LanguageDictionary languageDictionary, Form parentForm)
         {
-            currentDictionary = languageDictionary;
+            foreach (LanguageDictionary langDic in vocabularies)
+            {
+                if (langDic.IsEnglishTo)
+                {
+                    currentDictionary = langDic;
+                    break;
+                }
+            }
             LearningForm lForm = new LearningForm(this);
             lForm.FormClosing += delegate { parentForm.Visible = true; };
             parentForm.Visible = false;
@@ -90,6 +108,12 @@ namespace EnglishWhale.Controller
             form.MuteQuestion = currentDictionary.IsEnglishTo;
         }
 
+        public void SetMutesForLearningOnly(IMute form)
+        {
+            form.MuteAnswer = currentDictionary.IsEnglishTo;
+            form.MuteQuestion = currentDictionary.IsEnglishFrom;
+        }
+
         public WordsPair GetRamdomWordsPair()
         {
             int testPairNumber = rnd.Next(0, currentDictionary.Dict.Count);
@@ -102,7 +126,6 @@ namespace EnglishWhale.Controller
             isTimerNeeded = timer;
             currentDictionary = languageDictionary;
             ChooseAnswerQuizForm qcForm = new ChooseAnswerQuizForm(this, timer);
-            SetMutes(qcForm);
             qcForm.FormClosing += delegate { parentForm.Visible = true; };
             parentForm.Visible = false;
 
@@ -111,11 +134,12 @@ namespace EnglishWhale.Controller
 
         public bool isRightAnswer(string rightAnswer, string userAnswer)
         {
-            rightAnswer = Regex.Replace(rightAnswer, @"\.|,|\(.*?\)", "");
+            rightAnswer = Regex.Replace(rightAnswer.ToLower(), @"\.|,|\(.*?\)|^to\s|^a\s|\?|\!", "");
+            userAnswer = Regex.Replace(userAnswer.ToLower(), @"\.|,|\(.*?\)|^to\s|^a\s|\?|\!", "");
             string[] answers = rightAnswer.Split(';');
             foreach (string rightAns in answers)
             {
-                if (rightAns.Trim().Replace(".", "").ToLower().Equals(userAnswer))
+                if (rightAns.Trim().Equals(userAnswer))
                 {
                     return true;
                 }
@@ -219,12 +243,13 @@ namespace EnglishWhale.Controller
             HashSet<WordsPair> learningSet = new HashSet<WordsPair>(LEARNING_WORD_PAIRS_NUMBER);
             for (int i = 0; i < LEARNING_WORD_PAIRS_NUMBER; i++)
             {
+                int protector = 0;
                 WordsPair pair;
                 do
                 {
                     pair = GetRamdomWordsPair();
                 }
-                while (!learningSet.Add(pair));
+                while (!learningSet.Add(pair) && ++protector < 40);
             }
             return new LearningService(learningSet.ToList());
         }

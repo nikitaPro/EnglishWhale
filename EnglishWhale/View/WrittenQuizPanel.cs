@@ -19,9 +19,11 @@ namespace EnglishWhale.View
         private Timer timer;
         private MainController mContr;
         private int timeCounter;
+        private int helpCounter;
         private string rightAnswer;
         private Color normalBackColor;
         private Color normalForeColor;
+        private WordsPair currPair;
         private GetWordPairMethod GetWordPairVisit;
         public bool MuteQuestion { get; set; }
         public bool MuteAnswer { get; set; }
@@ -35,8 +37,13 @@ namespace EnglishWhale.View
             GetNextWordsPair();
             StatrTimer();
             this.Disposed += delegate { timer.Stop(); timer.Dispose(); };
+            SendFocusToUserAnswerField();
         }
 
+        private void SendFocusToUserAnswerField()
+        {
+            answerTextBox.Focus();
+        }
         private void NextButton_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
@@ -53,13 +60,13 @@ namespace EnglishWhale.View
 
         private void GetNextWordsPair()
         {
-            WordsPair pair = GetWordPairVisit(mContr);
-            if (pair == null)
+            currPair = GetWordPairVisit(mContr);
+            if (currPair == null)
             {
                 timer.Stop();
                 return;
             }
-            string question = pair.Original;
+            string question = currPair.Original;
             questionTextBox.Text = question;
             questionTextBox.SelectAll();
             questionTextBox.SelectionAlignment = HorizontalAlignment.Center;
@@ -68,7 +75,7 @@ namespace EnglishWhale.View
             {
                 mContr.SpeakThis(question);
             }
-            rightAnswer = pair.Translation;
+            rightAnswer = currPair.Translation;
         }
 
         private void StatrTimer()
@@ -102,6 +109,7 @@ namespace EnglishWhale.View
             normalForeColor = tBox.ForeColor;
             tBox.BackColor = Color.Red;
             tBox.ForeColor = Color.White;
+            currPair.Learned = false;
             Reset();
         }
 
@@ -128,6 +136,8 @@ namespace EnglishWhale.View
             bool isRightAns = mContr.isRightAnswer(rightAnswer, answer);
             if (isRightAns)
             {
+
+                currPair.Learned = true;
                 Control tBox = sender as Control;
                 normalBackColor = tBox.BackColor;
                 normalForeColor = tBox.ForeColor;
@@ -143,6 +153,7 @@ namespace EnglishWhale.View
 
         private void Reset()
         {
+            helpCounter = 0;
             answerTextBox.TextChanged -= AnswerTextBox_TextChanged;
             answerTextBox.ReadOnly = true;
             answerTextBox.Text = rightAnswer;
@@ -154,7 +165,7 @@ namespace EnglishWhale.View
                 mContr.SpeakThis(rightAnswer);
             }
             Timer tmr = new Timer();
-            tmr.Interval = 5000;
+            tmr.Interval = 3000;
             tmr.Tick += AnswerTextBoxReset_Tick;
             tmr.Start();
         }
@@ -164,6 +175,7 @@ namespace EnglishWhale.View
             Button btn = sender as Button;
             SetEnebledWithRefresh(btn, false);
             string userAnswer = answerTextBox.Text;
+            helpCounter++;
             if (String.IsNullOrEmpty(userAnswer))
             {
                 answerTextBox.Text = rightAnswer.Substring(0, 1);
@@ -171,7 +183,7 @@ namespace EnglishWhale.View
                 return;
             }
             // If you use this for help you with the last letter then you will lose
-            if (userAnswer.StartsWith(rightAnswer.Substring(0, rightAnswer.Length - 1)))
+            if (helpCounter > 3 || userAnswer.StartsWith(rightAnswer.Substring(0, rightAnswer.Length - 1)))
             {
                 WrongAnswer(answerTextBox, null);
                 return;
@@ -204,7 +216,7 @@ namespace EnglishWhale.View
             SetEnebledWithRefresh(btn, true);
         }
 
-        private void SetEnebledWithRefresh(Button btn, bool enabled)
+    private void SetEnebledWithRefresh(Button btn, bool enabled)
         {
             btn.Enabled = enabled;
             btn.Refresh();
