@@ -69,6 +69,7 @@
     <Compile Include="Controller\MainController.cs" />
     <Compile Include="Models\QuizWithAnswers.cs" />
     <Compile Include="Models\WordsPair.cs" />
+    <Compile Include="Services\CsvWritter.cs" />
     <Compile Include="Services\LearningService.cs" />
     <Compile Include="View\CustomButton.cs">
       <SubType>Component</SubType>

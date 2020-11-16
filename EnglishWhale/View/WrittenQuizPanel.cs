@@ -58,13 +58,17 @@ namespace EnglishWhale.View
             g.FillPolygon(Brushes.Black, polygonPoint);
         }
 
-        private void GetNextWordsPair()
+        private bool GetNextWordsPair()
         {
             currPair = GetWordPairVisit(mContr);
             if (currPair == null)
             {
-                timer.Stop();
-                return;
+                if (timer != null)
+                {
+                    timer.Stop();
+                    timer.Dispose();
+                }
+                return false;
             }
             string question = currPair.Original;
             questionTextBox.Text = question;
@@ -76,6 +80,12 @@ namespace EnglishWhale.View
                 mContr.SpeakThis(question);
             }
             rightAnswer = currPair.Translation;
+            return true;
+        }
+
+        internal void Finish()
+        {
+            throw new NotImplementedException();
         }
 
         private void StatrTimer()
@@ -109,24 +119,25 @@ namespace EnglishWhale.View
             normalForeColor = tBox.ForeColor;
             tBox.BackColor = Color.Red;
             tBox.ForeColor = Color.White;
-            currPair.Learned = false;
+            currPair.Studied = false;
             Reset();
         }
 
         private void AnswerTextBoxReset_Tick(object sender, EventArgs e)
         {
-            if (this.IsDisposed) return;
             Timer tmr = sender as Timer;
             tmr.Stop();
             tmr.Dispose();
             answerTextBox.BackColor = normalBackColor;
             answerTextBox.ForeColor = normalForeColor;
             answerTextBox.Text = String.Empty;
-            answerTextBox.TextChanged += AnswerTextBox_TextChanged;
             answerTextBox.ReadOnly = false;
-            GetNextWordsPair();
-            StatrTimer();
-            SetEnebledWithRefresh(nextButton, true);
+            answerTextBox.TextChanged += AnswerTextBox_TextChanged;
+            if (GetNextWordsPair())
+            {
+                StatrTimer();
+                SetEnebledWithRefresh(nextButton, true);
+            }
         }
 
         private void AnswerTextBox_TextChanged(object sender, EventArgs e)
@@ -137,7 +148,7 @@ namespace EnglishWhale.View
             if (isRightAns)
             {
 
-                currPair.Learned = true;
+                currPair.Studied = true;
                 Control tBox = sender as Control;
                 normalBackColor = tBox.BackColor;
                 normalForeColor = tBox.ForeColor;
@@ -158,6 +169,7 @@ namespace EnglishWhale.View
             answerTextBox.ReadOnly = true;
             answerTextBox.Text = rightAnswer;
             timer.Stop();
+            timer.Dispose();
             timeCounter = 0;
             timerBar.Value = timeCounter;
             if (!MuteAnswer)
@@ -194,8 +206,8 @@ namespace EnglishWhale.View
                 return;
             }
 
-            char[] rAnsChars = rightAnswer.ToCharArray();
-            char[] userAnsChars = userAnswer.ToCharArray();
+            char[] rAnsChars = rightAnswer.ToLower().ToCharArray();
+            char[] userAnsChars = userAnswer.ToLower().ToCharArray();
             char[] helpChars = new char[rAnsChars.Length];
 
             for (int i = 0; i < rAnsChars.Length; i++)

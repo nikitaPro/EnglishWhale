@@ -32,7 +32,7 @@ namespace EnglishWhale.Services
                 if (tempWords.Count != 0) return false;
                 foreach (WordsPair pair in words)
                 {
-                    if(!pair.Learned)
+                    if(!pair.Studied)
                     {
                         return false;
                     }

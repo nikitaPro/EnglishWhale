@@ -66,7 +66,26 @@ namespace EnglishWhale.Controller
                 QuizzesChooserForm qcForm = new QuizzesChooserForm(this);
                 vocabularies = csvReader.Vocabularies;
                 qcForm.Add(csvReader.Vocabularies);
-                qcForm.FormClosed += delegate { mForm.Visible = true; };
+                qcForm.FormClosed += 
+                    delegate 
+                    {
+                        try
+                        {
+                            if (vocabularies[0].IsEnglishTo)
+                            {
+                                CsvWritter.writeCsv(vocabularies[0], path);
+                            }
+                            else
+                            {
+                                CsvWritter.writeCsv(vocabularies[1], path);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            MessageBox.Show(mForm, "Selected .csv file opened by another program.", "File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        mForm.Visible = true; 
+                    };
                 mForm.Visible = false;
                 qcForm.Show();
             }
@@ -114,11 +133,37 @@ namespace EnglishWhale.Controller
             form.MuteQuestion = currentDictionary.IsEnglishFrom;
         }
 
-        public WordsPair GetRamdomWordsPair()
+        public WordsPair GetLearnedRamdomWordsPair()
         {
-            int testPairNumber = rnd.Next(0, currentDictionary.Dict.Count);
-            KeyValuePair<string, string> pair = currentDictionary.Dict.ElementAt(testPairNumber);
-            return new WordsPair(pair.Key, pair.Value);
+            if (currentDictionary.LearnedWords.Count != 0)
+            {
+                return GetRamdomWordsPair(currentDictionary.LearnedWords);
+            }
+            if (currentDictionary.WordsToStudy.Count != 0)
+            {
+                return GetRamdomWordsPair(currentDictionary.WordsToStudy);
+            }
+            return null;
+        }
+
+        public WordsPair GetRamdomWordsPairToStudy()
+        {
+            if (currentDictionary.WordsToStudy.Count != 0)
+            {
+                return GetRamdomWordsPair(currentDictionary.WordsToStudy);
+            }
+            if (currentDictionary.LearnedWords.Count != 0)
+            {
+                return GetRamdomWordsPair(currentDictionary.LearnedWords);
+            }
+            return null;
+        }
+
+        public WordsPair GetRamdomWordsPair(List<WordsPair> list)
+        {
+            int testPairNumber = rnd.Next(0, list.Count);
+            WordsPair pair = list.ElementAt(testPairNumber);
+            return pair;
         }
 
         public void StartChooseAnswerQuiz(LanguageDictionary languageDictionary, bool timer, Form parentForm)
@@ -134,12 +179,12 @@ namespace EnglishWhale.Controller
 
         public bool isRightAnswer(string rightAnswer, string userAnswer)
         {
-            rightAnswer = Regex.Replace(rightAnswer.ToLower(), @"\.|,|\(.*?\)|^to\s|^a\s|\?|\!", "");
-            userAnswer = Regex.Replace(userAnswer.ToLower(), @"\.|,|\(.*?\)|^to\s|^a\s|\?|\!", "");
+            rightAnswer = Regex.Replace(rightAnswer.ToLower(), @"\.|,|\(.*?\)|^to\s|^a\s|\?|\!", "").Replace("  ", " ");
+            userAnswer = Regex.Replace(userAnswer.ToLower(), @"\.|,|\(.*?\)|^to\s|^a\s|\?|\!", "").Replace("  ", " ");
             string[] answers = rightAnswer.Split(';');
             foreach (string rightAns in answers)
             {
-                if (rightAns.Trim().Equals(userAnswer))
+                if (rightAns.Trim().Equals(userAnswer.Trim()))
                 {
                     return true;
                 }
@@ -199,21 +244,19 @@ namespace EnglishWhale.Controller
 
         public QuizWithAnswers GetNewChooseAnswerQuiz()
         {
-            int testPairNumber = rnd.Next(0, currentDictionary.Dict.Count);
-            KeyValuePair<string, string> testPair = currentDictionary.Dict.ElementAt(testPairNumber);
-            string question = testPair.Key;
-            string rightAnswer = testPair.Value;
+            WordsPair testPair = GetLearnedRamdomWordsPair();
+            string question = testPair.Original;
+            string rightAnswer = testPair.Translation;
             string[] wrongs = new string[3];
             for (int i = 0; i < 3; i++)
             {
-                int wrongPairNumber;
+                WordsPair wrongPair;
                 do
                 {
-                    wrongPairNumber = rnd.Next(0, currentDictionary.Dict.Count);
-                } while (wrongPairNumber == testPairNumber);
+                    wrongPair = GetLearnedRamdomWordsPair();
+                } while (wrongPair.Equals(testPair));
 
-                KeyValuePair<string, string> wrongPair = currentDictionary.Dict.ElementAt(wrongPairNumber);
-                wrongs[i] = wrongPair.Value;
+                wrongs[i] = wrongPair.Translation;
             }
             QuizWithAnswers quiz = new QuizWithAnswers(question, rightAnswer, wrongs[0], wrongs[1], wrongs[2]);
             return quiz;
@@ -247,7 +290,7 @@ namespace EnglishWhale.Controller
                 WordsPair pair;
                 do
                 {
-                    pair = GetRamdomWordsPair();
+                    pair = GetRamdomWordsPairToStudy();
                 }
                 while (!learningSet.Add(pair) && ++protector < 40);
             }

@@ -8,16 +8,30 @@ namespace EnglishWhale.Models
 {
     public class WordsPair
     {
+        public delegate void FireWordStudied(WordsPair sender);
+        public event FireWordStudied WordStudied;
         public string Original { get; }
         public string Translation { get; }
-        public bool Learned { get; set; }
-
-        public WordsPair(string orig, string trans)
+        protected bool studied;
+        public bool Studied 
+        { 
+            get { return studied; } 
+            set 
+            { 
+                studied = value;
+                if (studied)
+                {
+                    WordStudied(this);
+                }
+            } 
+        }
+        public WordsPair(string orig, string trans, bool learned)
         {
             Original = orig;
             Translation = trans;
-            Learned = false;
+            studied = learned;
         }
+        public WordsPair(string orig, string trans) : this(orig, trans, false) { }
 
         public override bool Equals(object obj)
         {
@@ -32,6 +46,16 @@ namespace EnglishWhale.Models
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Original);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Translation);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return $"\"{Original}\",\"{Translation}\",{(studied ? 1 : 0)}";
+        }
+
+        public void Reset()
+        {
+            studied = false;
         }
     }
 }

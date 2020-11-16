@@ -1,10 +1,7 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using EnglishWhale.Models;
 using System.IO;
 
@@ -25,10 +22,10 @@ namespace EnglishWhale.Services
         private void readCsv()
         {
             checkEmptyFields();
-            using (TextFieldParser csvParser = new TextFieldParser(path))
+            using (TextFieldParser csvParser = new TextFieldParser(path, Encoding.Default))
             {
-                LanguageDictionary directTranslation;
-                LanguageDictionary reversTranslation;
+                Dictionary<string, WordsPair> directTranslation = new Dictionary<string, WordsPair>();
+                Dictionary <string, WordsPair> reversTranslation = new Dictionary<string, WordsPair>(); ;
                 // set up parser
                 csvParser.CommentTokens = new string[] { "#" };
                 csvParser.SetDelimiters(new string[] { "," });
@@ -41,6 +38,9 @@ namespace EnglishWhale.Services
                 LanguageDictionary.EnglishIs englishIs ;
                 string from = fields[0];
                 string to = fields[1];
+                string firstWord = fields[2];
+                string secondWord = fields[3];
+                bool studied = false;
                 try
                 {
                     englishIs = enDetector.isTheDirectionEnglish(to)
@@ -59,45 +59,50 @@ namespace EnglishWhale.Services
                 {
                     throw new IOException("No english at first row.");
                 }
-
+                if (fields.Length == 5)
+                {
+                    studied = fields[4].Equals("1");
+                }
                 // initiate dictionary with first row
-                directTranslation = new LanguageDictionary(fields[0], fields[1], englishIs);
-                directTranslation.Dict.Add(fields[2], fields[3]);
-                reversTranslation = new LanguageDictionary(fields[1], fields[0], 
-                    englishIs.Equals(LanguageDictionary.EnglishIs.TO) ? LanguageDictionary.EnglishIs.FROM : LanguageDictionary.EnglishIs.TO);
-                reversTranslation.Dict.Add(fields[3], fields[2]);
+                directTranslation.Add(fields[2], new WordsPair(firstWord, secondWord, studied));
+                reversTranslation.Add(fields[3], new WordsPair(secondWord, firstWord, studied)); 
                 // let's process other rows
                 while (!csvParser.EndOfData)
                 {
                     // Read current line fields, pointer moves to the next line.
                     fields = csvParser.ReadFields();
-                    string firstWord = fields[2];
-                    string secondWord = fields[3];
+                    firstWord = fields[2];
+                    secondWord = fields[3];
+                    studied = false;
+                    if (fields.Length == 5)
+                    {
+                        studied = fields[4].Equals("1");
+                    }
 
-                    if (fields[0].Equals(directTranslation.From))
+                    if (fields[0].Equals(from))
                     {
                         // if key exist then concatenates second meaning to translation
                         if (directTranslation.ContainsKey(firstWord))
-                            directTranslation[firstWord] = $"{directTranslation[firstWord]}; {secondWord}";
+                            directTranslation[firstWord] = new WordsPair(firstWord, $"{directTranslation[firstWord].Translation}; {secondWord}", studied);
                         else
-                            directTranslation.Add(firstWord, secondWord);
+                            directTranslation.Add(firstWord, new WordsPair(firstWord, secondWord, studied));
 
                         if (reversTranslation.ContainsKey(secondWord))
-                            reversTranslation[secondWord] = $"{reversTranslation[secondWord]}; {firstWord}";
+                            reversTranslation[secondWord] = new WordsPair(secondWord, $"{reversTranslation[secondWord].Translation}; {firstWord}", studied);
                         else
-                            reversTranslation.Add(secondWord, firstWord);
+                            reversTranslation.Add(secondWord, new WordsPair(secondWord, firstWord, studied));
                     } 
-                    else if (fields[0].Equals(reversTranslation.From))
+                    else if (fields[0].Equals(to))
                     {
                         if (reversTranslation.ContainsKey(firstWord))
-                            reversTranslation[firstWord] = $"{reversTranslation[firstWord]}; {secondWord}";
+                            reversTranslation[firstWord] = new WordsPair(firstWord, $"{reversTranslation[firstWord].Translation}; {secondWord}", studied);
                         else
-                            reversTranslation.Add(firstWord, secondWord);
+                            reversTranslation.Add(firstWord, new WordsPair(firstWord, secondWord, studied));
 
                         if (directTranslation.ContainsKey(secondWord))
-                            directTranslation[secondWord] = $"{directTranslation[secondWord]}; {firstWord}";
+                            directTranslation[secondWord] = new WordsPair(secondWord, $"{directTranslation[secondWord].Translation}; {firstWord}", studied);
                         else
-                            directTranslation.Add(secondWord, firstWord);
+                            directTranslation.Add(secondWord, new WordsPair(secondWord, firstWord, studied));
                     }
                     else
                     {
@@ -105,11 +110,24 @@ namespace EnglishWhale.Services
                     }
                    
                 }
-                Vocabularies.Add(directTranslation);
-                Vocabularies.Add(reversTranslation);
+
+                LanguageDictionary directTranslationLanguageDictionary = new LanguageDictionary(from, to, englishIs);
+                LanguageDictionary reversTranslationLanguageDictionary = new LanguageDictionary(to, from, 
+                    englishIs.Equals(LanguageDictionary.EnglishIs.TO) ? LanguageDictionary.EnglishIs.FROM : LanguageDictionary.EnglishIs.TO);
+                foreach (WordsPair wPair in directTranslation.Values)
+                {
+                    directTranslationLanguageDictionary.Add(wPair);
+                }
+                foreach (WordsPair wPair in reversTranslation.Values)
+                {
+                    reversTranslationLanguageDictionary.Add(wPair);
+                }
+                Vocabularies.Add(directTranslationLanguageDictionary);
+                Vocabularies.Add(reversTranslationLanguageDictionary);
+
                 // TODO: Delete below
-                Console.WriteLine($"{directTranslation.From} -> {directTranslation.To} {directTranslation.Dict.Count}");
-                Console.WriteLine($"{reversTranslation.From} -> {reversTranslation.To} {reversTranslation.Dict.Count}");
+                Console.WriteLine($"{directTranslationLanguageDictionary} {directTranslation.Count}");
+                Console.WriteLine($"{reversTranslationLanguageDictionary} {reversTranslation.Count}");
             }
         }
 
@@ -122,10 +140,18 @@ namespace EnglishWhale.Services
                 csvParser.SetDelimiters(new string[] { "," });
                 csvParser.HasFieldsEnclosedInQuotes = true;
                 csvParser.TrimWhiteSpace = true;
+                if (csvParser.EndOfData)
+                {
+                    throw new IOException("File is empty.");
+                }
                 // read first row
                 while (!csvParser.EndOfData)
                 {
                     string[] fields = csvParser.ReadFields();
+                    if (fields.Length < 4)
+                    {
+                        throw new IOException("File has missing columns.");
+                    }
                     foreach (string cell in fields)
                     {
                         if (String.IsNullOrWhiteSpace(cell))

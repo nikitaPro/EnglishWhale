@@ -14,7 +14,8 @@ namespace EnglishWhale.Models
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public string From { get; }
         public string To { get; }
-        public Dictionary<string, string> Dict { get; }
+        public List<WordsPair> LearnedWords { get; protected set; }
+        public List<WordsPair> WordsToStudy { get; protected set; }
         private EnglishIs english;
         public bool IsEnglishTo { get { return english.Equals(EnglishIs.TO); } }
         public bool IsEnglishFrom { get { return english.Equals(EnglishIs.FROM); } }
@@ -24,23 +25,47 @@ namespace EnglishWhale.Models
             From = from;
             To = to;
             english = fromOrTo;
-            Dict = new Dictionary<string, string>();
+            WordsToStudy = new List<WordsPair>();
+            LearnedWords = new List<WordsPair>();
         }
 
-        public string this[string s]
+        /*public WordsPair this[string s]
         {
             get { return Dict[s];  }
             set { Dict[s] = value;  }
+        }*/
+
+        public void Add (WordsPair pair)
+        {
+            pair.WordStudied += moveWordPair;
+            if (pair.Studied)
+            {
+                LearnedWords.Add(pair);
+            } 
+            else
+            {
+                WordsToStudy.Add(pair);
+            }
         }
 
-        public void Add (string s1, string s2)
+        public void moveWordPair(WordsPair wPair)
         {
-            Dict.Add(s1, s2);
-        }
-
-        public bool ContainsKey(string key)
-        {
-            return Dict.ContainsKey(key);
+            if (wPair.Studied)
+            {
+                if (WordsToStudy.Remove(wPair))
+                {
+                    LearnedWords.Add(wPair);
+                }
+            }
+            if (WordsToStudy.Count == 0)
+            {
+                WordsToStudy = LearnedWords;
+                LearnedWords = new List<WordsPair>();
+                foreach (WordsPair pair in WordsToStudy)
+                {
+                    pair.Reset();
+                }
+            }
         }
 
         public override string ToString()
