@@ -36,7 +36,7 @@ namespace EnglishWhale
             writtenQuizPanel = new WrittenQuizPanel(mContr, 
                 delegate (MainController mController) 
                 { 
-                    return mController.GetLearnedRamdomWordsPair(); 
+                    return mController.GetAnyRandomWordsPair(); 
                 });
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

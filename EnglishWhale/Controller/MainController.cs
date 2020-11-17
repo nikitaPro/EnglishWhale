@@ -133,33 +133,43 @@ namespace EnglishWhale.Controller
             form.MuteQuestion = currentDictionary.IsEnglishFrom;
         }
 
-        public WordsPair GetLearnedRamdomWordsPair()
+        public WordsPair GetLearnedRandomWordsPair()
         {
             if (currentDictionary.LearnedWords.Count != 0)
             {
-                return GetRamdomWordsPair(currentDictionary.LearnedWords);
+                return GetRandomWordsPair(currentDictionary.LearnedWords);
             }
             if (currentDictionary.WordsToStudy.Count != 0)
             {
-                return GetRamdomWordsPair(currentDictionary.WordsToStudy);
+                return GetRandomWordsPair(currentDictionary.WordsToStudy);
             }
             return null;
         }
 
-        public WordsPair GetRamdomWordsPairToStudy()
+        public WordsPair GetRandomWordsPairToStudy()
         {
             if (currentDictionary.WordsToStudy.Count != 0)
             {
-                return GetRamdomWordsPair(currentDictionary.WordsToStudy);
+                return GetRandomWordsPair(currentDictionary.WordsToStudy);
             }
             if (currentDictionary.LearnedWords.Count != 0)
             {
-                return GetRamdomWordsPair(currentDictionary.LearnedWords);
+                return GetRandomWordsPair(currentDictionary.LearnedWords);
             }
             return null;
         }
 
-        public WordsPair GetRamdomWordsPair(List<WordsPair> list)
+        public WordsPair GetAnyRandomWordsPair()
+        {
+            List<WordsPair> studyList = currentDictionary.WordsToStudy;
+            List<WordsPair> learnedList = currentDictionary.LearnedWords;
+            int rundomNumber = rnd.Next(0, studyList.Count + learnedList.Count);
+            List<WordsPair> list = rundomNumber < studyList.Count ? currentDictionary.WordsToStudy : currentDictionary.LearnedWords;
+            
+            return GetRandomWordsPair(list);
+        }
+
+        public WordsPair GetRandomWordsPair(List<WordsPair> list)
         {
             int testPairNumber = rnd.Next(0, list.Count);
             WordsPair pair = list.ElementAt(testPairNumber);
@@ -244,7 +254,7 @@ namespace EnglishWhale.Controller
 
         public QuizWithAnswers GetNewChooseAnswerQuiz()
         {
-            WordsPair testPair = GetLearnedRamdomWordsPair();
+            WordsPair testPair = GetAnyRandomWordsPair();
             string question = testPair.Original;
             string rightAnswer = testPair.Translation;
             string[] wrongs = new string[3];
@@ -253,7 +263,7 @@ namespace EnglishWhale.Controller
                 WordsPair wrongPair;
                 do
                 {
-                    wrongPair = GetLearnedRamdomWordsPair();
+                    wrongPair = GetAnyRandomWordsPair();
                 } while (wrongPair.Equals(testPair));
 
                 wrongs[i] = wrongPair.Translation;
@@ -290,7 +300,7 @@ namespace EnglishWhale.Controller
                 WordsPair pair;
                 do
                 {
-                    pair = GetRamdomWordsPairToStudy();
+                    pair = GetRandomWordsPairToStudy();
                 }
                 while (!learningSet.Add(pair) && ++protector < 40);
             }
